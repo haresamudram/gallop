@@ -283,6 +283,7 @@ class GalLoP_custom(CLIP):
         if self.use_local_features:
             local_features = local_features / local_features.norm(dim=-1, keepdim=True)
             local_logits = torch.einsum("bpd,knd-> bpkn", local_features, local_text_features)
+            
         else:
             local_logits = None
 
