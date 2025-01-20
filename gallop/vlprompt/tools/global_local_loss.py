@@ -41,7 +41,9 @@ class GlobalLocalLoss(_WeightedLoss):
 
         if self.use_local_loss and local_logits is not None:
             local_logits = topk_reduce(local_logits, self.topk)
-            local_loss = F.cross_entropy(logit_scale * local_logits, targets.unsqueeze(-1).expand(-1, local_logits.size(-1)))
+            # Product of the local logits
+            local_logits = local_logits.prod(dim=2)
+            local_loss = F.cross_entropy(logit_scale * local_logits, targets)
 
         if self.use_global_loss:
             # Dropout:
