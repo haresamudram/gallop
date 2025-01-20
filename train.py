@@ -1,6 +1,6 @@
 from typing import Type, Dict, Tuple, Optional
 from collections import defaultdict
-import os
+import os, yaml
 import math
 import argparse
 
@@ -18,7 +18,7 @@ import gallop.vlprompt.tools as vlp_tools
 import gallop.datasets.tools as dts_tools
 from gallop.datasets import return_train_val_datasets, return_ood_loaders, return_domains_loaders
 #from gallop.vlprompt import GalLoP  # Original Model
-from gallop.vlprompt import gallop_custom as GalLoP # Custom Model 
+from gallop.vlprompt import GalLoP_custom as GalLoP # Custom Model 
 from gallop.vlprompt.tools import GlobalLocalLoss
 
 NoneType = Type[None]
@@ -248,6 +248,14 @@ if __name__ == "__main__":
     parser.add_argument("--print_freq", default=20, type=int)
 
     args = parser.parse_args()
+
+    # Save args to a YAML file
+    folder = "/ood_datadrive/ood/results/GaLloP/NearOOD/training_params"
+    file = "iteration_1.yaml"
+    file_path = os.path.join(folder, file)
+    os.makedirs(folder, exist_ok=True)
+    with open(file_path, "w") as file:
+        yaml.dump(args, file, default_flow_style=False)
 
     lib.setup_logger()
     lib.random_seed(args.seed)
