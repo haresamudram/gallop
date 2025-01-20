@@ -1,4 +1,4 @@
-CUDA_VISIBLE_DEVICES=0 python gallop/train.py \
+CUDA_VISIBLE_DEVICES=0 python train.py \
     --clip_name clip_vit_b16 \
     --exp_name imagenet_shot_16 \
     --save_dir /ood_datadrive/ood/results/GaLloP/NearOOD/iteration1 \
@@ -6,7 +6,7 @@ CUDA_VISIBLE_DEVICES=0 python gallop/train.py \
     --max_epoch 50 \
     --batch_size 128 \
     --eval_ood True \
-    --eval_domains True \
+    --eval_domains False \
     --eval_freq 10 \
     --checkpointing_segments 5 \
     --use_local_features True \
