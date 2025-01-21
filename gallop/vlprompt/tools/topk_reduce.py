@@ -32,7 +32,7 @@ def topk_reduce(
     else:
         if custom_loss:
             prompt1 = local_logits[:, :5, :, 0].mean(dim=1)
-            prompt2 = local_logits[:, 5:15, :, 1].mean(dim=1)
+            prompt2 = local_logits[:, 5:30, :, 1].mean(dim=1)
             local_logits = torch.stack([prompt1, prompt2], dim=-1)
         else :
             local_logits = torch.stack([local_logits[:, :k, :, i].mean(dim=1) for i, k in enumerate(topk)], dim=-1)
