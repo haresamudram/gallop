@@ -78,6 +78,7 @@ class GalLoP_custom(CLIP):
         self.ood_method = ood_method
         self.ood_temp_scale = ood_temp_scale
         self.topk = topk
+        self.filter_k = 196
 
         self.parallel_text_encoder = parallel_text_encoder
         self.parallel_vision_encoder = parallel_vision_encoder
@@ -282,6 +283,22 @@ class GalLoP_custom(CLIP):
 
         if self.use_local_features:
             local_features = local_features / local_features.norm(dim=-1, keepdim=True)
+            # Filtering local features based on global promts
+            
+            k = 150
+            b, num_features, feature_dim = local_features.shape  # b: batch size, num_features: 196, feature_dim: 512
+            assert k <= num_features, "k cannot be greater than the number of features (196)"
+
+            prompts = text_features.permute(1, 0, 2)  # Shape: [4, 512, 1000]
+            sample_image_logits = torch.matmul(local_features.unsqueeze(1), prompts.transpose(-2, -1))  # Shape: [b, 4, 196, 1000]
+
+            avg_tensor = torch.max(sample_image_logits, dim=-1)[0].mean(dim=1)  # Compute averaged max values [b, 196]
+            _, indices = torch.topk(avg_tensor, k=k, dim=-1, largest=False)  # Get least k indices [b, k]
+
+            mask = torch.ones((b, num_features), dtype=bool, device=local_features.device).scatter_(1, indices, False)
+            filtered_local_features = local_features[mask].view(b, num_features - k, feature_dim)  # Shape: [b, 46, 512]
+            local_features = filtered_local_features
+
             local_logits = torch.einsum("bpd,knd-> bpkn", local_features, local_text_features)
             
         else:
