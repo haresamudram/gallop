@@ -46,13 +46,10 @@ def topk_reduce_spacial(
 
         for col in range(30):
             # Check if the column from indices_prompt_2 is not in indices_prompt_1
-            #if indices_prompt_2[row, col] not in indices_prompt_1[row, :]:
-            #    # Accumulate corresponding values from prompt2
-            #    local_logits_prompt2[row, :] += prompt2[row, indices_prompt_2[row, col].tolist(), :]
-            #    count += 1  # Increment valid column count
-
-            # Average the top 30
-            local_logits_prompt2[row, :] += prompt2[row, indices_prompt_2[row, col].tolist(), :]
+            if indices_prompt_2[row, col] not in indices_prompt_1[row, :]:
+                # Accumulate corresponding values from prompt2
+                local_logits_prompt2[row, :] += prompt2[row, indices_prompt_2[row, col].tolist(), :]
+                count += 1  # Increment valid column count
             
             # Accumulate the first 5 columns for prompt1
             if col < 5:
@@ -60,7 +57,7 @@ def topk_reduce_spacial(
 
     # Normalize results
     local_logits_prompt1 /= 5  # Average over the first 5 columns
-    local_logits_prompt2 /= 30  # Average over the valid columns
+    local_logits_prompt2 /= count  # Average over the valid columns
     local_logits = local_logits_prompt1 * local_logits_prompt2
     return local_logits
     
