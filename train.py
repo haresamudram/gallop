@@ -17,8 +17,8 @@ import gallop.lib as lib
 import gallop.vlprompt.tools as vlp_tools
 import gallop.datasets.tools as dts_tools
 from gallop.datasets import return_train_val_datasets, return_ood_loaders, return_domains_loaders
-#from gallop.vlprompt import GalLoP  # Original Model
-from gallop.vlprompt import GalLoP_custom as GalLoP # Custom Model 
+from gallop.vlprompt import GalLoP  # Original Model
+#from gallop.vlprompt import GalLoP_custom as GalLoP # Custom Model 
 from gallop.vlprompt.tools import GlobalLocalLoss
 
 from torch.utils.tensorboard import SummaryWriter
@@ -88,11 +88,15 @@ def train_one_epoch(
             )
     
     # Tensorboard logging
+    
+    # Logging ood training metrics
     metrics =  {k: v.avg for k, v in meter.items()}
     writer.add_scalar('Loss', metrics['loss'], epoch)
-    writer.add_scalar('Top1_Training', metrics['top1'], epoch)
-    writer.add_scalar('Top1_Global_Training', metrics['top1_global'], epoch)
-    writer.add_scalar('Top1_Local_Training', metrics['top1_local'], epoch)
+    writer.add_scalars('Training_Accuracy', {
+        'Top1': metrics['top1'],
+        'Top1_Global': metrics['top1_global'],
+        'Top1_Local': metrics['top1_local']
+    }, epoch)
     writer.add_scalar('Learning_Rate', optimizer.param_groups[0]['lr'], epoch)
     
     progress.display_summary()
@@ -257,7 +261,8 @@ if __name__ == "__main__":
     parser.add_argument("--save_freq", default=5, type=int)
     parser.add_argument("--print_freq", default=20, type=int)
 
-    parser.add_argument("--iteration", default=-1, type=int, help="Iteration number for the experiment") 
+    parser.add_argument("--iteration", default=-1, type=int, help="Iteration number for the experiment")
+    parser.add_argument("--patch_filtering", default=150, type=int, help="Number of patches to filter") 
     args = parser.parse_args()
 
     # Save args to a YAML file
@@ -306,7 +311,7 @@ if __name__ == "__main__":
         domains_loaders = return_domains_loaders(args.data_dir, val_transform)
 
     # Setting-up tensorboard
-    folder_path = os.path.join("/ood_datadrive/ood/results/GaLloP/NearOOD", "logs")
+    folder_path = os.path.join("/ood_datadrive/ood/results/GaLloP/NearOOD", "logs", f"iteration_{args.iteration}")
     writer = SummaryWriter(log_dir=folder_path)
 
     # Setting-up model
@@ -326,7 +331,7 @@ if __name__ == "__main__":
         ood_temp_scale=args.ood_temp_scale,
         topk=args.topk,
         parallel_text_encoder=args.parallel_text_encoder,
-        parallel_vision_encoder=args.parallel_vision_encoder,
+        parallel_vision_encoder=args.parallel_vision_encoder
     )
 
     model.initialize_prompt()
@@ -379,17 +384,23 @@ if __name__ == "__main__":
             lib.LOGGER.info("Evaluation metrics: " + " ".join([" *"] + val_meter.summary()))
 
             if args.eval_ood and (args.eval_only or (epoch % args.eval_freq == 0)):
+                val_meter, test_scores = evaluate(model, val_loader, args, return_scores=args.eval_ood)
                 ood_metrics = evaluate_ood(model, val_loader, ood_loaders, args, test_scores=test_scores)
                 lib.LOGGER.info(f"OOD Evaluation metrics with temperature scale {args.ood_temp_scale} (FPR95 / AUROC): ")
                 lib.log_ood_metrics(ood_metrics)
 
                 # Logging ood evaluation metrics
-                metrics =  {k: v.avg for k, v in val_meter.items()}
-                writer.add_scalar('Top1_Evaluation', metrics['top1'], epoch)
-                writer.add_scalar('Top1_Global_Evaluation', metrics['top1_global'], epoch)
-                writer.add_scalar('Top1_Local__Evaluation', metrics['top1_local'], epoch)
-                for dataset, _ in ood_loaders.items():
+                metrics = {k: v.avg for k, v in val_meter.items()}
+
+                # Log all evaluation accuracies under a single tag
+                writer.add_scalars('Evaluation_Accuracy', {
+                    'Top1': metrics['top1'],
+                    'Top1_Global': metrics['top1_global'],
+                    'Top1_Local': metrics['top1_local']
+                }, epoch)
+
                 # Log metrics for all datasets under a shared tag with dataset-specific sub-tags
+                for dataset, _ in ood_loaders.items():
                     writer.add_scalars('OOD_Metrics', {
                         f'{dataset}_FPR95': ood_metrics[dataset]['fpr95'],
                         f'{dataset}_AUROC': ood_metrics[dataset]['auroc']
