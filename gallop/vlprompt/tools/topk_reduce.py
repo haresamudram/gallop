@@ -25,7 +25,7 @@ def topk_reduce(
     local_logits = local_logits.topk(dim=1, k=maxk)[0]
 
     # Local prompt 1 focus on the top 5 patches while local prompt 2 focus on the next 10 patches.
-    custom_prompts = False
+    custom_prompts = True
 
     if len(topk) == 1:
         local_logits = local_logits.mean(dim=1)
@@ -34,7 +34,7 @@ def topk_reduce(
             prompt1 = local_logits[:, :topk[0], :, 0].mean(dim=1)
             prompt2 = local_logits[:, topk[0]:topk[1], :, 1].mean(dim=1)
             local_logits = torch.stack([prompt1, prompt2], dim=-1)
-            local_logits = local_logits[...,0] * local_logits[...,1]
+            local_logits = (local_logits[...,0] + local_logits[...,1]) / 2
         else :
             local_logits = torch.stack([local_logits[:, :k, :, i].mean(dim=1) for i, k in enumerate(topk)], dim=-1)
 
