@@ -1,0 +1,5 @@
+[[36m2025-02-10 14:39:55[0m][[94mGalLoP[0m][[32mINFO[0m] - Setting the seed to 1[0m
+[[36m2025-02-10 14:39:55[0m][[94mGalLoP[0m][[32mINFO[0m] - Running experiment imagenet_shot_16[0m
+[[36m2025-02-10 14:39:58[0m][[94mGalLoP[0m][[32mINFO[0m] - Using template: A photo of a <class_name>[0m
+[[36m2025-02-10 14:40:05[0m][[94mGalLoP[0m][[33mWARNING[0m] - Missing keys in CLIP: ['global_prompt', 'local_prompts', 'local_proj.linear.weight'][0m
+[[36m2025-02-10 14:40:05[0m][[94mGalLoP[0m][[32mINFO[0m] - Loading checkpoint /ood_datadrive/ood/results/GaLloP/iteration2/imagenet_shot_16/gallop_imagenet_vit_b16_seed1.ckpt[0m

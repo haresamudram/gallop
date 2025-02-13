@@ -1,0 +1,14 @@
+[[36m2025-02-10 11:57:47[0m][[94mGalLoP[0m][[32mINFO[0m] - Setting the seed to 1[0m
+[[36m2025-02-10 11:57:47[0m][[94mGalLoP[0m][[32mINFO[0m] - Running experiment imagenet_shot_16[0m
+[[36m2025-02-10 11:57:50[0m][[94mGalLoP[0m][[32mINFO[0m] - Using template: A photo of a <class_name>[0m
+[[36m2025-02-10 11:57:57[0m][[94mGalLoP[0m][[33mWARNING[0m] - Missing keys in CLIP: ['global_prompt', 'local_prompts', 'local_proj.linear.weight'][0m
+[[36m2025-02-10 11:57:57[0m][[94mGalLoP[0m][[32mINFO[0m] - Loading checkpoint /ood_datadrive/ood/results/GaLloP/NearOOD/iteration6/imagenet_shot_16/gallop_imagenet_vit_b16_seed1.ckpt[0m
+[[36m2025-02-10 11:57:57[0m][[94mGalLoP[0m][[32mINFO[0m] - global_prompt added to params_group[0m
+[[36m2025-02-10 11:57:57[0m][[94mGalLoP[0m][[32mINFO[0m] - local_prompts added to params_group[0m
+[[36m2025-02-10 11:57:57[0m][[94mGalLoP[0m][[32mINFO[0m] - local_proj.linear.weight added to params_group[0m
+[[36m2025-02-10 11:57:57[0m][[94mGalLoP[0m][[32mINFO[0m] - Evaluation[0m
+[[36m2025-02-10 11:58:54[0m][[94mGalLoP[0m][[32mINFO[0m] - Evaluation metrics:  * top1: 75.269 top1_global: 71.898 top1_local: 71.258[0m
+[[36m2025-02-10 12:02:10[0m][[94mGalLoP[0m][[32mINFO[0m] - OOD Evaluation metrics with temperature scale 1.0 (FPR95 / AUROC): [0m
+[[36m2025-02-10 12:02:10[0m][[94mGalLoP[0m][[32mINFO[0m] - *** =============[0m
+[[36m2025-02-10 12:02:10[0m][[94mGalLoP[0m][[32mINFO[0m] - *           Ninco          SSB-Hard       iNaturalist               SUN            Places          Textures         OpenImage           Average[0m
+[[36m2025-02-10 12:02:10[0m][[94mGalLoP[0m][[32mINFO[0m] - *   73.338 / 76.128&  82.576 / 69.123&  15.082 / 97.091&  30.324 / 94.260&  45.422 / 91.559&  51.578 / 89.660&  32.204 / 93.619&   47.218 / 87.348[0m

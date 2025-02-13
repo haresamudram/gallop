@@ -1,0 +1,26 @@
+[[36m2025-01-24 11:22:03[0m][[94mGalLoP[0m][[32mINFO[0m] - Setting the seed to 1[0m
+[[36m2025-01-24 11:22:03[0m][[94mGalLoP[0m][[32mINFO[0m] - Running experiment imagenet_shot_16[0m
+[[36m2025-01-24 11:22:06[0m][[94mGalLoP[0m][[32mINFO[0m] - Using template: A photo of a <class_name>[0m
+[[36m2025-01-24 11:22:19[0m][[94mGalLoP[0m][[33mWARNING[0m] - Missing keys in CLIP: ['global_prompt', 'local_prompts', 'local_proj.linear.weight'][0m
+[[36m2025-01-24 11:22:20[0m][[94mGalLoP[0m][[32mINFO[0m] - global_prompt added to params_group[0m
+[[36m2025-01-24 11:22:20[0m][[94mGalLoP[0m][[32mINFO[0m] - local_prompts added to params_group[0m
+[[36m2025-01-24 11:22:20[0m][[94mGalLoP[0m][[32mINFO[0m] - local_proj.linear.weight added to params_group[0m
+[[36m2025-01-24 11:34:32[0m][[94mGalLoP[0m][[32mINFO[0m] -  * loss: 3.922 top1: 60.413 top1_global: 60.869 top1_local: 47.144[0m
+[[36m2025-01-24 11:46:33[0m][[94mGalLoP[0m][[32mINFO[0m] -  * loss: 3.516 top1: 62.425 top1_global: 61.869 top1_local: 53.431[0m
+[[36m2025-01-24 11:53:26[0m][[94mGalLoP[0m][[32mINFO[0m] -  * loss: 3.431 top1: 62.700 top1_global: 61.612 top1_local: 55.456[0m
+[[36m2025-01-24 11:59:08[0m][[94mGalLoP[0m][[32mINFO[0m] -  * loss: 3.309 top1: 64.044 top1_global: 62.019 top1_local: 57.462[0m
+[[36m2025-01-24 12:04:51[0m][[94mGalLoP[0m][[32mINFO[0m] -  * loss: 3.267 top1: 64.438 top1_global: 62.206 top1_local: 57.950[0m
+[[36m2025-01-24 12:10:34[0m][[94mGalLoP[0m][[32mINFO[0m] -  * loss: 3.230 top1: 64.719 top1_global: 62.044 top1_local: 59.450[0m
+[[36m2025-01-24 12:10:34[0m][[94mGalLoP[0m][[32mINFO[0m] - Evaluation[0m
+[[36m2025-01-24 12:11:30[0m][[94mGalLoP[0m][[32mINFO[0m] - Evaluation metrics:  * top1: 72.913 top1_global: 70.871 top1_local: 65.627[0m
+[[36m2025-01-24 12:15:02[0m][[94mGalLoP[0m][[32mINFO[0m] - OOD Evaluation metrics with temperature scale 1.0 (FPR95 / AUROC): [0m
+[[36m2025-01-24 12:15:02[0m][[94mGalLoP[0m][[32mINFO[0m] - *** =============[0m
+[[36m2025-01-24 12:15:02[0m][[94mGalLoP[0m][[32mINFO[0m] - *           Ninco          SSB-Hard       iNaturalist               SUN            Places          Textures         OpenImage           Average[0m
+[[36m2025-01-24 12:15:02[0m][[94mGalLoP[0m][[32mINFO[0m] - *   73.971 / 72.446&  85.255 / 67.449&  19.980 / 95.772&  23.020 / 94.907&  32.170 / 91.547&  46.365 / 87.948&  33.258 / 92.550&   44.860 / 86.088[0m
+[[36m2025-01-24 12:20:45[0m][[94mGalLoP[0m][[32mINFO[0m] -  * loss: 3.163 top1: 65.688 top1_global: 62.444 top1_local: 60.100[0m
+[[36m2025-01-24 12:26:27[0m][[94mGalLoP[0m][[32mINFO[0m] -  * loss: 3.143 top1: 65.438 top1_global: 62.194 top1_local: 60.831[0m
+[[36m2025-01-24 12:32:09[0m][[94mGalLoP[0m][[32mINFO[0m] -  * loss: 3.126 top1: 65.844 top1_global: 61.981 top1_local: 61.556[0m
+[[36m2025-01-24 12:39:37[0m][[94mGalLoP[0m][[32mINFO[0m] -  * loss: 3.063 top1: 66.581 top1_global: 62.394 top1_local: 62.438[0m
+[[36m2025-01-24 12:54:10[0m][[94mGalLoP[0m][[32mINFO[0m] -  * loss: 3.034 top1: 66.688 top1_global: 62.288 top1_local: 63.500[0m
+[[36m2025-01-24 12:54:10[0m][[94mGalLoP[0m][[32mINFO[0m] - Evaluation[0m
+[[36m2025-01-24 12:56:36[0m][[94mGalLoP[0m][[32mINFO[0m] - Evaluation metrics:  * top1: 73.438 top1_global: 71.056 top1_local: 66.720[0m

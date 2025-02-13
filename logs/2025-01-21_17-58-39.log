@@ -1,0 +1,113 @@
+[[36m2025-01-21 17:58:39[0m][[94mGalLoP[0m][[32mINFO[0m] - Setting the seed to 1[0m
+[[36m2025-01-21 17:58:39[0m][[94mGalLoP[0m][[32mINFO[0m] - Running experiment imagenet_shot_16[0m
+[[36m2025-01-21 17:58:43[0m][[94mGalLoP[0m][[32mINFO[0m] - Using template: A photo of a <class_name>[0m
+[[36m2025-01-21 17:58:50[0m][[94mGalLoP[0m][[33mWARNING[0m] - Missing keys in CLIP: ['global_prompt', 'local_prompts', 'local_proj.linear.weight'][0m
+[[36m2025-01-21 17:58:50[0m][[94mGalLoP[0m][[32mINFO[0m] - global_prompt added to params_group[0m
+[[36m2025-01-21 17:58:50[0m][[94mGalLoP[0m][[32mINFO[0m] - local_prompts added to params_group[0m
+[[36m2025-01-21 17:58:50[0m][[94mGalLoP[0m][[32mINFO[0m] - local_proj.linear.weight added to params_group[0m
+[[36m2025-01-21 18:03:30[0m][[94mGalLoP[0m][[32mINFO[0m] -  * loss: 4.083 top1: 59.419 top1_global: 60.962 top1_local: 47.106[0m
+[[36m2025-01-21 18:08:10[0m][[94mGalLoP[0m][[32mINFO[0m] -  * loss: 3.523 top1: 61.750 top1_global: 61.763 top1_local: 54.306[0m
+[[36m2025-01-21 18:12:50[0m][[94mGalLoP[0m][[32mINFO[0m] -  * loss: 3.408 top1: 62.462 top1_global: 61.712 top1_local: 56.163[0m
+[[36m2025-01-21 18:17:30[0m][[94mGalLoP[0m][[32mINFO[0m] -  * loss: 3.280 top1: 63.788 top1_global: 62.300 top1_local: 58.425[0m
+[[36m2025-01-21 18:22:09[0m][[94mGalLoP[0m][[32mINFO[0m] -  * loss: 3.235 top1: 63.956 top1_global: 62.394 top1_local: 59.119[0m
+[[36m2025-01-21 18:26:49[0m][[94mGalLoP[0m][[32mINFO[0m] -  * loss: 3.195 top1: 64.750 top1_global: 62.362 top1_local: 60.119[0m
+[[36m2025-01-21 18:26:49[0m][[94mGalLoP[0m][[32mINFO[0m] - Evaluation[0m
+[[36m2025-01-21 18:27:41[0m][[94mGalLoP[0m][[32mINFO[0m] - Evaluation metrics:  * top1: 73.007 top1_global: 71.160 top1_local: 67.500[0m
+[[36m2025-01-21 18:30:12[0m][[94mGalLoP[0m][[32mINFO[0m] - OOD Evaluation metrics with temperature scale 1.0 (FPR95 / AUROC): [0m
+[[36m2025-01-21 18:30:12[0m][[94mGalLoP[0m][[32mINFO[0m] - *** =============[0m
+[[36m2025-01-21 18:30:12[0m][[94mGalLoP[0m][[32mINFO[0m] - *           Ninco          SSB-Hard       iNaturalist               SUN            Places          Textures         OpenImage           Average[0m
+[[36m2025-01-21 18:30:12[0m][[94mGalLoP[0m][[32mINFO[0m] - *   100.000 / 0.000&  100.000 / 0.000&  100.000 / 0.000&  100.000 / 0.000&  100.000 / 0.000&  100.000 / 0.000&  100.000 / 0.000&   100.000 / 0.000[0m
+[[36m2025-01-21 18:34:52[0m][[94mGalLoP[0m][[32mINFO[0m] -  * loss: 3.119 top1: 65.131 top1_global: 62.706 top1_local: 61.075[0m
+[[36m2025-01-21 18:39:31[0m][[94mGalLoP[0m][[32mINFO[0m] -  * loss: 3.101 top1: 65.369 top1_global: 62.869 top1_local: 61.519[0m
+[[36m2025-01-21 18:44:11[0m][[94mGalLoP[0m][[32mINFO[0m] -  * loss: 3.053 top1: 65.994 top1_global: 62.987 top1_local: 62.644[0m
+[[36m2025-01-21 18:48:50[0m][[94mGalLoP[0m][[32mINFO[0m] -  * loss: 3.010 top1: 65.963 top1_global: 62.150 top1_local: 63.225[0m
+[[36m2025-01-21 18:53:30[0m][[94mGalLoP[0m][[32mINFO[0m] -  * loss: 3.055 top1: 65.981 top1_global: 62.312 top1_local: 63.406[0m
+[[36m2025-01-21 18:53:30[0m][[94mGalLoP[0m][[32mINFO[0m] - Evaluation[0m
+[[36m2025-01-21 18:54:19[0m][[94mGalLoP[0m][[32mINFO[0m] - Evaluation metrics:  * top1: 73.693 top1_global: 71.611 top1_local: 69.131[0m
+[[36m2025-01-21 18:56:48[0m][[94mGalLoP[0m][[32mINFO[0m] - OOD Evaluation metrics with temperature scale 1.0 (FPR95 / AUROC): [0m
+[[36m2025-01-21 18:56:48[0m][[94mGalLoP[0m][[32mINFO[0m] - *** =============[0m
+[[36m2025-01-21 18:56:48[0m][[94mGalLoP[0m][[32mINFO[0m] - *           Ninco          SSB-Hard       iNaturalist               SUN            Places          Textures         OpenImage           Average[0m
+[[36m2025-01-21 18:56:48[0m][[94mGalLoP[0m][[32mINFO[0m] - *   100.000 / 0.000&  100.000 / 0.000&  100.000 / 0.000&  100.000 / 0.000&  100.000 / 0.000&  100.000 / 0.000&  100.000 / 0.000&   100.000 / 0.000[0m
+[[36m2025-01-21 19:01:28[0m][[94mGalLoP[0m][[32mINFO[0m] -  * loss: 2.960 top1: 66.550 top1_global: 62.812 top1_local: 64.119[0m
+[[36m2025-01-21 19:06:08[0m][[94mGalLoP[0m][[32mINFO[0m] -  * loss: 2.974 top1: 67.150 top1_global: 63.156 top1_local: 64.681[0m
+[[36m2025-01-21 19:10:47[0m][[94mGalLoP[0m][[32mINFO[0m] -  * loss: 2.933 top1: 67.094 top1_global: 63.038 top1_local: 65.006[0m
+[[36m2025-01-21 19:15:27[0m][[94mGalLoP[0m][[32mINFO[0m] -  * loss: 2.895 top1: 67.700 top1_global: 63.188 top1_local: 65.825[0m
+[[36m2025-01-21 19:20:07[0m][[94mGalLoP[0m][[32mINFO[0m] -  * loss: 2.866 top1: 67.856 top1_global: 63.288 top1_local: 65.912[0m
+[[36m2025-01-21 19:20:07[0m][[94mGalLoP[0m][[32mINFO[0m] - Evaluation[0m
+[[36m2025-01-21 19:20:57[0m][[94mGalLoP[0m][[32mINFO[0m] - Evaluation metrics:  * top1: 74.031 top1_global: 71.642 top1_local: 69.236[0m
+[[36m2025-01-21 19:23:27[0m][[94mGalLoP[0m][[32mINFO[0m] - OOD Evaluation metrics with temperature scale 1.0 (FPR95 / AUROC): [0m
+[[36m2025-01-21 19:23:27[0m][[94mGalLoP[0m][[32mINFO[0m] - *** =============[0m
+[[36m2025-01-21 19:23:27[0m][[94mGalLoP[0m][[32mINFO[0m] - *           Ninco          SSB-Hard       iNaturalist               SUN            Places          Textures         OpenImage           Average[0m
+[[36m2025-01-21 19:23:27[0m][[94mGalLoP[0m][[32mINFO[0m] - *   100.000 / 0.000&  100.000 / 0.000&  100.000 / 0.000&  100.000 / 0.000&  100.000 / 0.000&  100.000 / 0.000&  100.000 / 0.000&   100.000 / 0.000[0m
+[[36m2025-01-21 19:28:06[0m][[94mGalLoP[0m][[32mINFO[0m] -  * loss: 2.868 top1: 68.144 top1_global: 63.362 top1_local: 66.600[0m
+[[36m2025-01-21 19:32:46[0m][[94mGalLoP[0m][[32mINFO[0m] -  * loss: 2.836 top1: 68.019 top1_global: 63.413 top1_local: 66.819[0m
+[[36m2025-01-21 19:37:26[0m][[94mGalLoP[0m][[32mINFO[0m] -  * loss: 2.844 top1: 68.381 top1_global: 63.106 top1_local: 67.075[0m
+[[36m2025-01-21 19:42:06[0m][[94mGalLoP[0m][[32mINFO[0m] -  * loss: 2.821 top1: 68.438 top1_global: 63.388 top1_local: 67.444[0m
+[[36m2025-01-21 19:46:46[0m][[94mGalLoP[0m][[32mINFO[0m] -  * loss: 2.806 top1: 68.612 top1_global: 63.288 top1_local: 68.069[0m
+[[36m2025-01-21 19:46:46[0m][[94mGalLoP[0m][[32mINFO[0m] - Evaluation[0m
+[[36m2025-01-21 19:47:35[0m][[94mGalLoP[0m][[32mINFO[0m] - Evaluation metrics:  * top1: 74.178 top1_global: 71.651 top1_local: 69.613[0m
+[[36m2025-01-21 19:50:05[0m][[94mGalLoP[0m][[32mINFO[0m] - OOD Evaluation metrics with temperature scale 1.0 (FPR95 / AUROC): [0m
+[[36m2025-01-21 19:50:05[0m][[94mGalLoP[0m][[32mINFO[0m] - *** =============[0m
+[[36m2025-01-21 19:50:05[0m][[94mGalLoP[0m][[32mINFO[0m] - *           Ninco          SSB-Hard       iNaturalist               SUN            Places          Textures         OpenImage           Average[0m
+[[36m2025-01-21 19:50:05[0m][[94mGalLoP[0m][[32mINFO[0m] - *   100.000 / 0.000&  100.000 / 0.000&  100.000 / 0.000&  100.000 / 0.000&  100.000 / 0.000&  100.000 / 0.000&  100.000 / 0.000&   100.000 / 0.000[0m
+[[36m2025-01-21 19:54:44[0m][[94mGalLoP[0m][[32mINFO[0m] -  * loss: 2.767 top1: 69.000 top1_global: 63.131 top1_local: 68.500[0m
+[[36m2025-01-21 19:59:24[0m][[94mGalLoP[0m][[32mINFO[0m] -  * loss: 2.775 top1: 69.131 top1_global: 63.500 top1_local: 68.525[0m
+[[36m2025-01-21 20:04:04[0m][[94mGalLoP[0m][[32mINFO[0m] -  * loss: 2.705 top1: 69.575 top1_global: 63.737 top1_local: 69.556[0m
+[[36m2025-01-21 20:08:43[0m][[94mGalLoP[0m][[32mINFO[0m] -  * loss: 2.710 top1: 69.825 top1_global: 63.556 top1_local: 69.769[0m
+[[36m2025-01-21 20:13:24[0m][[94mGalLoP[0m][[32mINFO[0m] -  * loss: 2.767 top1: 69.612 top1_global: 63.450 top1_local: 69.388[0m
+[[36m2025-01-21 20:13:24[0m][[94mGalLoP[0m][[32mINFO[0m] - Evaluation[0m
+[[36m2025-01-21 20:14:13[0m][[94mGalLoP[0m][[32mINFO[0m] - Evaluation metrics:  * top1: 74.604 top1_global: 71.764 top1_local: 70.113[0m
+[[36m2025-01-21 20:16:43[0m][[94mGalLoP[0m][[32mINFO[0m] - OOD Evaluation metrics with temperature scale 1.0 (FPR95 / AUROC): [0m
+[[36m2025-01-21 20:16:43[0m][[94mGalLoP[0m][[32mINFO[0m] - *** =============[0m
+[[36m2025-01-21 20:16:43[0m][[94mGalLoP[0m][[32mINFO[0m] - *           Ninco          SSB-Hard       iNaturalist               SUN            Places          Textures         OpenImage           Average[0m
+[[36m2025-01-21 20:16:43[0m][[94mGalLoP[0m][[32mINFO[0m] - *   100.000 / 0.000&  100.000 / 0.000&  100.000 / 0.000&  100.000 / 0.000&  100.000 / 0.000&  100.000 / 0.000&  100.000 / 0.000&   100.000 / 0.000[0m
+[[36m2025-01-21 20:21:23[0m][[94mGalLoP[0m][[32mINFO[0m] -  * loss: 2.660 top1: 70.425 top1_global: 64.400 top1_local: 70.306[0m
+[[36m2025-01-21 20:26:02[0m][[94mGalLoP[0m][[32mINFO[0m] -  * loss: 2.702 top1: 69.925 top1_global: 63.737 top1_local: 70.306[0m
+[[36m2025-01-21 20:30:42[0m][[94mGalLoP[0m][[32mINFO[0m] -  * loss: 2.653 top1: 70.281 top1_global: 63.656 top1_local: 70.638[0m
+[[36m2025-01-21 20:35:22[0m][[94mGalLoP[0m][[32mINFO[0m] -  * loss: 2.659 top1: 70.513 top1_global: 63.794 top1_local: 70.987[0m
+[[36m2025-01-21 20:40:02[0m][[94mGalLoP[0m][[32mINFO[0m] -  * loss: 2.671 top1: 70.569 top1_global: 63.694 top1_local: 71.088[0m
+[[36m2025-01-21 20:40:02[0m][[94mGalLoP[0m][[32mINFO[0m] - Evaluation[0m
+[[36m2025-01-21 20:40:51[0m][[94mGalLoP[0m][[32mINFO[0m] - Evaluation metrics:  * top1: 74.729 top1_global: 71.924 top1_local: 70.584[0m
+[[36m2025-01-21 20:43:20[0m][[94mGalLoP[0m][[32mINFO[0m] - OOD Evaluation metrics with temperature scale 1.0 (FPR95 / AUROC): [0m
+[[36m2025-01-21 20:43:20[0m][[94mGalLoP[0m][[32mINFO[0m] - *** =============[0m
+[[36m2025-01-21 20:43:20[0m][[94mGalLoP[0m][[32mINFO[0m] - *           Ninco          SSB-Hard       iNaturalist               SUN            Places          Textures         OpenImage           Average[0m
+[[36m2025-01-21 20:43:20[0m][[94mGalLoP[0m][[32mINFO[0m] - *   100.000 / 0.000&  100.000 / 0.000&  100.000 / 0.000&  100.000 / 0.000&  100.000 / 0.000&  100.000 / 0.000&  100.000 / 0.000&   100.000 / 0.000[0m
+[[36m2025-01-21 20:48:00[0m][[94mGalLoP[0m][[32mINFO[0m] -  * loss: 2.652 top1: 70.487 top1_global: 63.469 top1_local: 71.412[0m
+[[36m2025-01-21 20:52:39[0m][[94mGalLoP[0m][[32mINFO[0m] -  * loss: 2.635 top1: 71.019 top1_global: 63.669 top1_local: 72.125[0m
+[[36m2025-01-21 20:57:19[0m][[94mGalLoP[0m][[32mINFO[0m] -  * loss: 2.618 top1: 71.338 top1_global: 64.175 top1_local: 72.287[0m
+[[36m2025-01-21 21:01:58[0m][[94mGalLoP[0m][[32mINFO[0m] -  * loss: 2.594 top1: 71.144 top1_global: 64.463 top1_local: 71.694[0m
+[[36m2025-01-21 21:06:38[0m][[94mGalLoP[0m][[32mINFO[0m] -  * loss: 2.612 top1: 71.075 top1_global: 63.938 top1_local: 72.006[0m
+[[36m2025-01-21 21:06:38[0m][[94mGalLoP[0m][[32mINFO[0m] - Evaluation[0m
+[[36m2025-01-21 21:07:28[0m][[94mGalLoP[0m][[32mINFO[0m] - Evaluation metrics:  * top1: 74.813 top1_global: 71.911 top1_local: 70.789[0m
+[[36m2025-01-21 21:09:56[0m][[94mGalLoP[0m][[32mINFO[0m] - OOD Evaluation metrics with temperature scale 1.0 (FPR95 / AUROC): [0m
+[[36m2025-01-21 21:09:56[0m][[94mGalLoP[0m][[32mINFO[0m] - *** =============[0m
+[[36m2025-01-21 21:09:56[0m][[94mGalLoP[0m][[32mINFO[0m] - *           Ninco          SSB-Hard       iNaturalist               SUN            Places          Textures         OpenImage           Average[0m
+[[36m2025-01-21 21:09:56[0m][[94mGalLoP[0m][[32mINFO[0m] - *   100.000 / 0.000&  100.000 / 0.000&  100.000 / 0.000&  100.000 / 0.000&  100.000 / 0.000&  100.000 / 0.000&  100.000 / 0.000&   100.000 / 0.000[0m
+[[36m2025-01-21 21:14:36[0m][[94mGalLoP[0m][[32mINFO[0m] -  * loss: 2.598 top1: 71.250 top1_global: 64.031 top1_local: 72.506[0m
+[[36m2025-01-21 21:19:16[0m][[94mGalLoP[0m][[32mINFO[0m] -  * loss: 2.577 top1: 71.200 top1_global: 63.769 top1_local: 72.769[0m
+[[36m2025-01-21 21:23:55[0m][[94mGalLoP[0m][[32mINFO[0m] -  * loss: 2.619 top1: 70.906 top1_global: 63.538 top1_local: 72.513[0m
+[[36m2025-01-21 21:28:34[0m][[94mGalLoP[0m][[32mINFO[0m] -  * loss: 2.575 top1: 71.581 top1_global: 63.981 top1_local: 72.950[0m
+[[36m2025-01-21 21:33:14[0m][[94mGalLoP[0m][[32mINFO[0m] -  * loss: 2.569 top1: 71.644 top1_global: 64.131 top1_local: 73.000[0m
+[[36m2025-01-21 21:33:14[0m][[94mGalLoP[0m][[32mINFO[0m] - Evaluation[0m
+[[36m2025-01-21 21:34:04[0m][[94mGalLoP[0m][[32mINFO[0m] - Evaluation metrics:  * top1: 74.936 top1_global: 71.929 top1_local: 71.038[0m
+[[36m2025-01-21 21:36:33[0m][[94mGalLoP[0m][[32mINFO[0m] - OOD Evaluation metrics with temperature scale 1.0 (FPR95 / AUROC): [0m
+[[36m2025-01-21 21:36:33[0m][[94mGalLoP[0m][[32mINFO[0m] - *** =============[0m
+[[36m2025-01-21 21:36:33[0m][[94mGalLoP[0m][[32mINFO[0m] - *           Ninco          SSB-Hard       iNaturalist               SUN            Places          Textures         OpenImage           Average[0m
+[[36m2025-01-21 21:36:33[0m][[94mGalLoP[0m][[32mINFO[0m] - *   100.000 / 0.000&  100.000 / 0.000&  100.000 / 0.000&  100.000 / 0.000&  100.000 / 0.000&  100.000 / 0.000&  100.000 / 0.000&   100.000 / 0.000[0m
+[[36m2025-01-21 21:41:12[0m][[94mGalLoP[0m][[32mINFO[0m] -  * loss: 2.527 top1: 72.150 top1_global: 64.369 top1_local: 73.569[0m
+[[36m2025-01-21 21:45:52[0m][[94mGalLoP[0m][[32mINFO[0m] -  * loss: 2.527 top1: 72.056 top1_global: 64.362 top1_local: 73.850[0m
+[[36m2025-01-21 21:50:32[0m][[94mGalLoP[0m][[32mINFO[0m] -  * loss: 2.546 top1: 71.544 top1_global: 63.750 top1_local: 73.181[0m
+[[36m2025-01-21 21:55:11[0m][[94mGalLoP[0m][[32mINFO[0m] -  * loss: 2.539 top1: 71.831 top1_global: 64.388 top1_local: 73.706[0m
+[[36m2025-01-21 21:59:51[0m][[94mGalLoP[0m][[32mINFO[0m] -  * loss: 2.549 top1: 71.862 top1_global: 64.506 top1_local: 73.588[0m
+[[36m2025-01-21 21:59:51[0m][[94mGalLoP[0m][[32mINFO[0m] - Evaluation[0m
+[[36m2025-01-21 22:00:40[0m][[94mGalLoP[0m][[32mINFO[0m] - Evaluation metrics:  * top1: 75.033 top1_global: 71.998 top1_local: 71.242[0m
+[[36m2025-01-21 22:03:09[0m][[94mGalLoP[0m][[32mINFO[0m] - OOD Evaluation metrics with temperature scale 1.0 (FPR95 / AUROC): [0m
+[[36m2025-01-21 22:03:09[0m][[94mGalLoP[0m][[32mINFO[0m] - *** =============[0m
+[[36m2025-01-21 22:03:09[0m][[94mGalLoP[0m][[32mINFO[0m] - *           Ninco          SSB-Hard       iNaturalist               SUN            Places          Textures         OpenImage           Average[0m
+[[36m2025-01-21 22:03:09[0m][[94mGalLoP[0m][[32mINFO[0m] - *   100.000 / 0.000&  100.000 / 0.000&  100.000 / 0.000&  100.000 / 0.000&  100.000 / 0.000&  100.000 / 0.000&  100.000 / 0.000&   100.000 / 0.000[0m
+[[36m2025-01-21 22:07:49[0m][[94mGalLoP[0m][[32mINFO[0m] -  * loss: 2.561 top1: 71.869 top1_global: 63.825 top1_local: 73.781[0m
+[[36m2025-01-21 22:12:28[0m][[94mGalLoP[0m][[32mINFO[0m] -  * loss: 2.550 top1: 72.081 top1_global: 64.312 top1_local: 73.688[0m
+[[36m2025-01-21 22:17:08[0m][[94mGalLoP[0m][[32mINFO[0m] -  * loss: 2.543 top1: 72.156 top1_global: 64.475 top1_local: 73.963[0m
+[[36m2025-01-21 22:21:47[0m][[94mGalLoP[0m][[32mINFO[0m] -  * loss: 2.519 top1: 72.569 top1_global: 64.381 top1_local: 73.925[0m
+[[36m2025-01-21 22:21:47[0m][[94mGalLoP[0m][[32mINFO[0m] - Evaluation[0m
+[[36m2025-01-21 22:22:44[0m][[94mGalLoP[0m][[32mINFO[0m] - Evaluation metrics:  * top1: 75.058 top1_global: 71.973 top1_local: 71.202[0m

@@ -10,7 +10,7 @@ CUDA_VISIBLE_DEVICES=0,1 python gallop/train.py \
     --eval_freq 10 \
     --checkpointing_segments 5 \
     --use_local_features True \
-    --lr_init 0.002 \
+    --lr_init 0.002 \03
     --warmup_epoch 0 \
     --num_shots 16 \
     --parallel_text_encoder True \

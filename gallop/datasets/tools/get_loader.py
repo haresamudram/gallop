@@ -8,7 +8,7 @@ from torch.utils.data.distributed import DistributedSampler
 
 def get_eval_loader(
     dts: Dataset,
-    batch_size: int = 256,
+    batch_size: int = 128,
     num_workers: int = 10,
     persistent_workers: bool = False,
     shuffle: bool = False,

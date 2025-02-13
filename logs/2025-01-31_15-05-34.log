@@ -1,0 +1,13 @@
+[[36m2025-01-31 15:05:34[0m][[94mGalLoP[0m][[32mINFO[0m] - Setting the seed to 1[0m
+[[36m2025-01-31 15:05:34[0m][[94mGalLoP[0m][[32mINFO[0m] - Running experiment imagenet_shot_16[0m
+[[36m2025-01-31 15:05:38[0m][[94mGalLoP[0m][[32mINFO[0m] - Using template: A photo of a <class_name>[0m
+[[36m2025-01-31 15:05:44[0m][[94mGalLoP[0m][[33mWARNING[0m] - Missing keys in CLIP: ['global_prompt', 'local_prompts', 'local_proj.linear.weight'][0m
+[[36m2025-01-31 15:05:45[0m][[94mGalLoP[0m][[32mINFO[0m] - global_prompt added to params_group[0m
+[[36m2025-01-31 15:05:45[0m][[94mGalLoP[0m][[32mINFO[0m] - local_prompts added to params_group[0m
+[[36m2025-01-31 15:05:45[0m][[94mGalLoP[0m][[32mINFO[0m] - local_proj.linear.weight added to params_group[0m
+[[36m2025-01-31 15:05:45[0m][[94mGalLoP[0m][[32mINFO[0m] - Evaluation[0m
+[[36m2025-01-31 15:06:43[0m][[94mGalLoP[0m][[32mINFO[0m] - Evaluation metrics:  * top1: 64.691 top1_global: 66.569 top1_local: 32.709[0m
+[[36m2025-01-31 15:10:09[0m][[94mGalLoP[0m][[32mINFO[0m] - OOD Evaluation metrics with temperature scale 1.0 (FPR95 / AUROC): [0m
+[[36m2025-01-31 15:10:09[0m][[94mGalLoP[0m][[32mINFO[0m] - *** =============[0m
+[[36m2025-01-31 15:10:09[0m][[94mGalLoP[0m][[32mINFO[0m] - *           Ninco          SSB-Hard       iNaturalist               SUN            Places          Textures         OpenImage           Average[0m
+[[36m2025-01-31 15:10:09[0m][[94mGalLoP[0m][[32mINFO[0m] - *   72.321 / 76.326&  85.624 / 67.580&  15.360 / 96.624&  30.630 / 93.006&  37.760 / 90.059&  57.411 / 83.704&  35.288 / 92.194&   47.771 / 85.642[0m

@@ -1,0 +1,11 @@
+[[36m2025-01-25 18:27:50[0m][[94mGalLoP[0m][[32mINFO[0m] - Setting the seed to 1[0m
+[[36m2025-01-25 18:27:50[0m][[94mGalLoP[0m][[32mINFO[0m] - Running experiment imagenet_shot_16[0m
+[[36m2025-01-25 18:27:54[0m][[94mGalLoP[0m][[32mINFO[0m] - Using template: A photo of a <class_name>[0m
+[[36m2025-01-25 18:28:00[0m][[94mGalLoP[0m][[33mWARNING[0m] - Missing keys in CLIP: ['global_prompt', 'local_prompts', 'local_proj.linear.weight'][0m
+[[36m2025-01-25 18:28:00[0m][[94mGalLoP[0m][[32mINFO[0m] - global_prompt added to params_group[0m
+[[36m2025-01-25 18:28:00[0m][[94mGalLoP[0m][[32mINFO[0m] - local_prompts added to params_group[0m
+[[36m2025-01-25 18:28:00[0m][[94mGalLoP[0m][[32mINFO[0m] - local_proj.linear.weight added to params_group[0m
+[[36m2025-01-25 18:31:36[0m][[94mGalLoP[0m][[32mINFO[0m] -  * loss: 4.899 top1: 57.450 top1_global: 61.075 top1_local: 37.869[0m
+[[36m2025-01-25 18:35:10[0m][[94mGalLoP[0m][[32mINFO[0m] -  * loss: 4.823 top1: 59.194 top1_global: 61.663 top1_local: 38.050[0m
+[[36m2025-01-25 18:38:44[0m][[94mGalLoP[0m][[32mINFO[0m] -  * loss: 5.181 top1: 58.513 top1_global: 61.744 top1_local: 32.275[0m
+[[36m2025-01-25 18:42:52[0m][[94mGalLoP[0m][[32mINFO[0m] -  * loss: 5.249 top1: 59.244 top1_global: 62.312 top1_local: 30.462[0m

@@ -18,20 +18,23 @@ def topk_reduce_frequency(
     """
     if topk is None:
         return local_logits
-    batch_size, num_classes, num_prompt= local_logits.shape[0], 1000, local_logits.shape[3]
+    
+    batch_size, num_classes, num_prompts= local_logits.shape[0], 1000, local_logits.shape[3]
+    
     final_logits = torch.zeros(batch_size, num_classes, device=local_logits.device)  # (b x 1000)
-    max_logits, pred_classes = local_logits.max(dim=2)  # max_logits: (b x 196 x 4), pred_classes: (b x 196 x 4)
+    
+    max_logits, pred_classes = local_logits.max(dim=2)  # max_logits: (b x 196 x k), pred_classes: (b x 196 x k)
     
     for prompt_idx, top_k in enumerate(topk):
         # Extract max logits and class IDs for the current prompt
-        prompt_logits = max_logits[:, :, prompt_idx]  # (B x 196)
-        prompt_classes = pred_classes[:, :, prompt_idx]  # (B x 196)
+        prompt_logits = max_logits[:, :, prompt_idx]  # (b x 196)
+        prompt_classes = pred_classes[:, :, prompt_idx]  # (b x 196)
 
         # Find top-k patches for each batch
-        top_k_indices = torch.topk(prompt_logits, k=top_k, dim=1).indices  # (B x top_k)
+        top_k_indices = torch.topk(prompt_logits, k=top_k, dim=1).indices  # (b x top_k)
 
         # Compute weights for each batch
-        prompt_weighted_logits = torch.zeros(batch_size, num_classes, device=local_logits.device)  # (B x 1000)
+        prompt_weighted_logits = torch.zeros(batch_size, num_classes, device=local_logits.device)  # (b x 1000)
         for b in range(batch_size):
             # Extract top-k class IDs and logits for the batch
             batch_top_k_classes = prompt_classes[b, top_k_indices[b]]  # (top_k,)
@@ -53,5 +56,5 @@ def topk_reduce_frequency(
         final_logits += prompt_weighted_logits
 
     # Average across all prompts
-    final_logits /= num_prompts  # Shape: (B x 1000)
+    final_logits /= num_prompts  # Shape: (b x 1000)
     return final_logits

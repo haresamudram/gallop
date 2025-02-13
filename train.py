@@ -244,7 +244,7 @@ if __name__ == "__main__":
     parser.add_argument("--clip_name", required=True, choices=clip_model_names, type=str)
 
     parser.add_argument("--batch_size", default=32, type=int)
-    parser.add_argument("--inference_batch_size", default=256, type=int)
+    parser.add_argument("--inference_batch_size", default=128, type=int)
     parser.add_argument("--max_epoch", default=50, type=int)
     parser.add_argument("--optimizer", default="sgd", type=str)
     parser.add_argument("--lr_init", default=0.002, type=float)
@@ -384,7 +384,7 @@ if __name__ == "__main__":
             val_meter, test_scores = evaluate(model, val_loader, args, return_scores=args.eval_ood and (args.eval_only or (epoch + 1 == args.max_epoch)))
             lib.LOGGER.info("Evaluation metrics: " + " ".join([" *"] + val_meter.summary()))
 
-            if args.eval_ood and (args.eval_only or (epoch % args.eval_freq == 0)):
+            if args.eval_ood and (args.eval_only or (epoch % args.eval_freq == 0) or (epoch + 1 == args.max_epoch)):
                 val_meter, test_scores = evaluate(model, val_loader, args, return_scores=args.eval_ood)
                 ood_metrics = evaluate_ood(model, val_loader, ood_loaders, args, test_scores=test_scores)
                 lib.LOGGER.info(f"OOD Evaluation metrics with temperature scale {args.ood_temp_scale} (FPR95 / AUROC): ")

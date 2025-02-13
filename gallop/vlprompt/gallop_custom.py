@@ -56,6 +56,7 @@ class GalLoP_custom(CLIP):
         topk: List[int] = [5, 10, 15, 20],
         parallel_text_encoder: bool = False,
         parallel_vision_encoder: bool = False,
+        patch_filtering: int = 150,
     ) -> NoneType:
         self.model_name = "gallop_" + clip_name[5:]
         clip_model, _ = load_clip(CLIP_NAME[clip_name], device="cuda")
@@ -79,6 +80,7 @@ class GalLoP_custom(CLIP):
         self.ood_temp_scale = ood_temp_scale
         self.topk = topk
         self.filter_k = 196
+        self.patch_filtering = patch_filtering
 
         self.parallel_text_encoder = parallel_text_encoder
         self.parallel_vision_encoder = parallel_vision_encoder
@@ -285,7 +287,7 @@ class GalLoP_custom(CLIP):
             local_features = local_features / local_features.norm(dim=-1, keepdim=True)
             # Filtering local features based on global promts
             
-            k = 150
+            k = self.patch_filtering
             b, num_features, feature_dim = local_features.shape  # b: batch size, num_features: 196, feature_dim: 512
             assert k <= num_features, "k cannot be greater than the number of features (196)"
 
