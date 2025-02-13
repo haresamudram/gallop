@@ -5,7 +5,7 @@ import torch.nn.functional as F
 from torch.nn.modules.loss import _WeightedLoss
 from torch import Tensor
 
-from gallop.vlprompt.tools.topk_reduce import topk_reduce
+from gallop.vlprompt.tools.topk_reduce_spacial import topk_reduce_spacial
 
 NoneType = Type[None]
 
@@ -40,10 +40,9 @@ class GlobalLocalLoss(_WeightedLoss):
         global_loss = local_loss = 0.
 
         if self.use_local_loss and local_logits is not None:
-            local_logits = topk_reduce(local_logits, self.topk)
-            # Product of the local logits
-            local_logits = local_logits.prod(dim=2)
-            local_loss = F.cross_entropy(logit_scale * local_logits, targets)
+            local_logits = topk_reduce_spacial(local_logits, self.topk)
+            local_loss = F.cross_entropy(logit_scale * local_logits, targets.unsqueeze(-1).expand(-1, local_logits.size(-1)))
+
 
         if self.use_global_loss:
             # Dropout:
