@@ -49,7 +49,6 @@ def topk_reduce_spacial(
     filtered_logits_prompt_2 = torch.gather(prompt_2, dim=1, index=expanded_filtered)  # Shape: (128, N, 1000)
     local_logits_prompt_2 = filtered_logits_prompt_2.mean(dim=1)
     
-
     local_logits = torch.stack([local_logits_prompt_1, local_logits_prompt_2], dim=-1)
     return local_logits
     
