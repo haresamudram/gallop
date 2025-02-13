@@ -26,7 +26,7 @@ def topk_reduce_spacial(
     
     # Find top 5 indices from prompt_1 and top 30 indices from prompt_2
     top5_indices = torch.topk(max_logits_prompt_1, k=topk[0], dim=1).indices  # Shape: (128, 5)
-    top30_indices = torch.topk(max_logits_prompt_2, k=30, dim=1).indices  # Shape: (128, 30)
+    top30_indices = torch.topk(max_logits_prompt_2, k=topk[1], dim=1).indices  # Shape: (128, 30)
     
     # Remove top 5 indices from top 30 indices
     mask = torch.ones_like(top30_indices, dtype=torch.bool)  # Shape: (128, 30)
@@ -34,10 +34,10 @@ def topk_reduce_spacial(
         mask[batch_idx] = ~torch.isin(top30_indices[batch_idx], top5_indices[batch_idx])
 
     filtered_indices_list = [top30_indices[i][mask[i]] for i in range(b)]
-    max_valid_indices = max([len(f) for f in filtered_indices_list])
+    max_valid_indices = 25
     filtered_indices = torch.zeros(top30_indices.size(0), max_valid_indices, dtype=torch.long, device='cuda')
     for i, indices in enumerate(filtered_indices): 
-        filtered_indices[i, :len(indices)] = filtered_indices_list[i]
+        filtered_indices[i, :len(indices)] = filtered_indices_list[i][:max_valid_indices]
     
     # Compute local_logit_prompt_1
     expanded_top5 = top5_indices.unsqueeze(-1).expand(-1, -1, prompt_1.size(2))  # Shape: (128, 5, 1000)
@@ -50,6 +50,6 @@ def topk_reduce_spacial(
     local_logits_prompt_2 = filtered_logits_prompt_2.mean(dim=1)
     
 
-    local_logits = (local_logits_prompt_1 + local_logits_prompt_2) / 2 
+    local_logits = torch.stack([local_logits_prompt_1, local_logits_prompt_2], dim=-1)
     return local_logits
     
