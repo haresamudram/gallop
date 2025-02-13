@@ -312,6 +312,7 @@ if __name__ == "__main__":
 
     # Setting-up tensorboard
     folder_path = os.path.join("/ood_datadrive/ood/results/GaLloP/NearOOD", "logs", f"iteration_{args.iteration}")
+    os.makedirs(os.path.join("/ood_datadrive/ood/results/GaLloP/NearOOD", "logs"), exist_ok=True)
     writer = SummaryWriter(log_dir=folder_path)
 
     # Setting-up model
