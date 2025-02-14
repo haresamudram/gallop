@@ -25,7 +25,7 @@ def topk_reduce(
     local_logits = local_logits.topk(dim=1, k=maxk)[0]
 
     # Local prompt 1 focus on the top 5 patches while local prompt 2 focus on the next 10 patches.
-    custom_loss = True
+    custom_loss = False
 
     if len(topk) == 1:
         local_logits = local_logits.mean(dim=1)

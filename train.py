@@ -266,7 +266,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     # Save args to a YAML file
-    folder = "/ood_datadrive/ood/results/GaLloP/NearOOD/training_params"
+    folder = "/ood_datadrive/ood/results/GaLloP/training_params"
     file = f"iteration_{args.iteration}.yaml"
     file_path = os.path.join(folder, file)
     os.makedirs(folder, exist_ok=True)
@@ -311,8 +311,8 @@ if __name__ == "__main__":
         domains_loaders = return_domains_loaders(args.data_dir, val_transform)
 
     # Setting-up tensorboard
-    folder_path = os.path.join("/ood_datadrive/ood/results/GaLloP/NearOOD", "logs", f"iteration_{args.iteration}")
-    os.makedirs(os.path.join("/ood_datadrive/ood/results/GaLloP/NearOOD", "logs"), exist_ok=True)
+    folder_path = os.path.join("/ood_datadrive/ood/results/GaLloP", "logs", f"Gallop_5_30_iteration_{args.iteration}")
+    os.makedirs(os.path.join("/ood_datadrive/ood/results/GaLloP", "logs"), exist_ok=True)
     writer = SummaryWriter(log_dir=folder_path)
 
     # Setting-up model
