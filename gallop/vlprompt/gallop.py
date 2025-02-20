@@ -16,6 +16,8 @@ import gallop.vlprompt.tools as vlp_tools
 from gallop.vlprompt.prompted_transformers import PromptedTransformer
 from gallop.vlprompt.clip_local import ModifiedResNet, VisionTransformer, CLIP
 
+import pandas as pd
+
 NoneType = Type[None]
 KwargType = Dict[str, Any]
 CLIP_NAME = {"clip_vit_b32": "ViT-B/32", "clip_vit_b16": "ViT-B/16", "clip_resnet50": "RN50", "clip_resnet101": "RN101"}
@@ -78,6 +80,7 @@ class GalLoP(CLIP):
         self.ood_method = ood_method
         self.ood_temp_scale = ood_temp_scale
         self.topk = topk
+        
 
         self.parallel_text_encoder = parallel_text_encoder
         self.parallel_vision_encoder = parallel_vision_encoder
@@ -273,7 +276,13 @@ class GalLoP(CLIP):
             assert local_text_features is None, "local_text_features should be None if text_features is None"
             text_features, local_text_features = self.encode_text(class_names)
             text_features = text_features / text_features.norm(dim=-1, keepdim=True)
+            # text features with key phrases
+            data = pd.read_csv("/ood_datadrive/ood/models/GalLoP/gallop/vlprompt/key_phrases.csv")
+            key_phrases_text_features, key_phrases_local_text_features = self.encode_text(data['extracted key phrases'])
+            key_phrases_local_text_features = key_phrases_local_text_features / key_phrases_local_text_features.norm(dim=-1, keepdim=True)
             local_text_features = local_text_features / local_text_features.norm(dim=-1, keepdim=True) if self.learn_local_prompts else text_features
+
+            local_text_features = torch.cat((local_text_features, key_phrases_local_text_features), dim=1)
 
         image_features, local_features = self.encode_image_and_proj(image)
 
@@ -439,6 +448,6 @@ class GalLoP(CLIP):
             local_logits = local_logits.mean(dim=-1) # Local features of GalLoP
             local_probs = torch.softmax(logit_scale * local_logits, dim=-1)
             gl_logits = (global_logits + local_logits) / 2
-            gl_probs = torch.softmax(logit_scale * gl_logits, dim=-1)
+            gl_probs = torch.softmax(gl_logits, dim=-1)
 
         return gl_probs, global_probs, local_probs
