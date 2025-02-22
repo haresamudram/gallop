@@ -3,7 +3,7 @@ from collections import defaultdict
 import os, yaml
 import math
 import argparse
-
+import pandas as pd
 import numpy as np
 import torch
 from torch.optim import Optimizer
@@ -121,6 +121,14 @@ def evaluate(
         text_features, local_text_features = model.encode_text(class_names)
         text_features /= text_features.norm(dim=-1, keepdim=True)
         local_text_features /= local_text_features.norm(dim=-1, keepdim=True)
+        
+        data = pd.read_csv("/ood_datadrive/ood/models/GalLoP/gallop/vlprompt/key_phrases.csv")
+            
+        key_phrases_text_features, key_phrases_local_text_features = model.encode_text(data['extracted key phrases'])
+        key_phrases_local_text_features = key_phrases_local_text_features / key_phrases_local_text_features.norm(dim=-1, keepdim=True)
+    
+        local_text_features = torch.cat((local_text_features, key_phrases_local_text_features), dim=1)
+
 
     mode = model.training
     model.eval()

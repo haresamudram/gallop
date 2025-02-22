@@ -278,11 +278,13 @@ class GalLoP(CLIP):
             text_features = text_features / text_features.norm(dim=-1, keepdim=True)
             # text features with key phrases
             data = pd.read_csv("/ood_datadrive/ood/models/GalLoP/gallop/vlprompt/key_phrases.csv")
+            
             key_phrases_text_features, key_phrases_local_text_features = self.encode_text(data['extracted key phrases'])
             key_phrases_local_text_features = key_phrases_local_text_features / key_phrases_local_text_features.norm(dim=-1, keepdim=True)
+            
             local_text_features = local_text_features / local_text_features.norm(dim=-1, keepdim=True) if self.learn_local_prompts else text_features
 
-            local_text_features = torch.cat((local_text_features, key_phrases_local_text_features), dim=1)
+            local_text_features = (local_text_features + key_phrases_local_text_features)/2
 
         image_features, local_features = self.encode_image_and_proj(image)
 
