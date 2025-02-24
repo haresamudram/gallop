@@ -127,7 +127,7 @@ def evaluate(
         key_phrases_text_features, key_phrases_local_text_features = model.encode_text(data['extracted key phrases'])
         key_phrases_local_text_features = key_phrases_local_text_features / key_phrases_local_text_features.norm(dim=-1, keepdim=True)
     
-        local_text_features = torch.cat((local_text_features, key_phrases_local_text_features), dim=1)
+        local_text_features = (local_text_features+key_phrases_local_text_features)/2
 
 
     mode = model.training
