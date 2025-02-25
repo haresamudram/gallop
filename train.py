@@ -58,7 +58,8 @@ def train_one_epoch(
         targets = batch["target"].cuda(non_blocking=True)
         with autocast(enabled=args.use_fp16):
             global_logits, local_logits = model(images, class_names, text_features, local_text_features)
-            loss = loss_fn(global_logits, local_logits, targets, model.logit_scale.exp())
+            loss,global_loss = loss_fn(global_logits, local_logits, targets, model.logit_scale.exp())
+            local_loss = loss - global_loss
 
         fp16_scaler.scale(loss).backward()
         track_loader.set_postfix({"gpu": torch.cuda.max_memory_allocated() / 1024**3})
@@ -73,6 +74,8 @@ def train_one_epoch(
         meter.update(
             {
                 "loss": loss.detach().item(),
+                "global_loss":global_loss.detach().item(),
+                "local_loss":local_loss.detach().item(),
                 "top1": topk[0],
                 "top1_global": global_topk[0],
             },
@@ -126,8 +129,10 @@ def evaluate(
             
         key_phrases_text_features, key_phrases_local_text_features = model.encode_text(data['extracted key phrases'])
         key_phrases_local_text_features = key_phrases_local_text_features / key_phrases_local_text_features.norm(dim=-1, keepdim=True)
-    
+        key_phrases_text_features /= key_phrases_text_features.norm(dim=-1, keepdim=True)
+
         local_text_features = (local_text_features+key_phrases_local_text_features)/2
+        text_features = (text_features + key_phrases_text_features)/2
 
 
     mode = model.training
@@ -185,6 +190,15 @@ def evaluate_ood(
         text_features, local_text_features = model.encode_text(class_names)
         text_features /= text_features.norm(dim=-1, keepdim=True)
         local_text_features /= local_text_features.norm(dim=-1, keepdim=True)
+        
+        data = pd.read_csv("/ood_datadrive/ood/models/GalLoP/gallop/vlprompt/key_phrases.csv")
+            
+        key_phrases_text_features, key_phrases_local_text_features = model.encode_text(data['extracted key phrases'])
+        key_phrases_local_text_features = key_phrases_local_text_features / key_phrases_local_text_features.norm(dim=-1, keepdim=True)
+        key_phrases_text_features /= key_phrases_text_features.norm(dim=-1, keepdim=True)
+
+        local_text_features = (local_text_features+key_phrases_local_text_features)/2
+        text_features = (text_features + key_phrases_text_features)/2
 
     mode = model.training
     model.eval()
