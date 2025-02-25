@@ -57,4 +57,4 @@ class GlobalLocalLoss(_WeightedLoss):
             else:
                 raise ValueError(f"Global logits must have 2 or 3 dimensions, but got {global_logits.ndim}.")
 
-        return global_loss + local_loss
+        return global_loss + local_loss, global_loss

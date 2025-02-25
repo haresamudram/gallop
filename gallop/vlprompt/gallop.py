@@ -276,14 +276,14 @@ class GalLoP(CLIP):
             assert local_text_features is None, "local_text_features should be None if text_features is None"
             text_features, local_text_features = self.encode_text(class_names)
             text_features = text_features / text_features.norm(dim=-1, keepdim=True)
-            # text features with key phrases
-            data = pd.read_csv("/ood_datadrive/ood/models/GalLoP/gallop/vlprompt/key_phrases.csv")
-            
-            key_phrases_text_features, key_phrases_local_text_features = self.encode_text(data['extracted key phrases'])
-            key_phrases_local_text_features = key_phrases_local_text_features / key_phrases_local_text_features.norm(dim=-1, keepdim=True)
-            
             local_text_features = local_text_features / local_text_features.norm(dim=-1, keepdim=True) if self.learn_local_prompts else text_features
 
+            # text features with key phrases
+            data = pd.read_csv("/ood_datadrive/ood/models/GalLoP/gallop/vlprompt/key_phrases.csv")
+            key_phrases_text_features, key_phrases_local_text_features = self.encode_text(data['extracted key phrases'])
+            key_phrases_text_features /=  key_phrases_text_features.norm(dim=-1, keepdim=True)
+            key_phrases_local_text_features /=  key_phrases_local_text_features.norm(dim=-1, keepdim=True)
+            
             local_text_features = (local_text_features + key_phrases_local_text_features)/2
             text_features = (text_features + key_phrases_text_features)/2
 
@@ -447,6 +447,7 @@ class GalLoP(CLIP):
             local_probs = None
             gl_probs = global_probs
         else:
+            local_logits = vlp_tools.topk_reduce(local_logits, topk=self.topk)
             local_logits = local_logits.mean(dim=-1) # Local features of GalLoP
             local_probs = torch.softmax(logit_scale * local_logits, dim=-1)
             gl_logits = (global_logits + local_logits) / 2
