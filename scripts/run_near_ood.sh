@@ -1,7 +1,7 @@
 CUDA_VISIBLE_DEVICES=0 python train.py \
     --clip_name clip_vit_b16 \
     --exp_name imagenet_shot_16 \
-    --save_dir /ood_datadrive/ood/results/GaLloP/NearOOD/key_phrases_2 \
+    --save_dir /ood_datadrive/ood/results/GaLloP/NearOOD/key_phrases_4 \
     --dataset_name imagenet \
     --max_epoch 50 \
     --batch_size 128 \
@@ -25,4 +25,4 @@ CUDA_VISIBLE_DEVICES=0 python train.py \
     --learn_local_prompt True \
     --n_local_prompts 2 \
     --topk 5 30\
-    --iteration 2 \
+    --iteration 4 \

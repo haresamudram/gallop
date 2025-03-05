@@ -127,7 +127,7 @@ def evaluate(
         
         data = pd.read_csv("/ood_datadrive/ood/models/GalLoP/gallop/vlprompt/key_phrases.csv")
             
-        key_phrases_text_features, key_phrases_local_text_features = model.encode_text(data['extracted key phrases'])
+        key_phrases_text_features, key_phrases_local_text_features = model.encode_text(data['key_phrase_1'])
         key_phrases_local_text_features = key_phrases_local_text_features / key_phrases_local_text_features.norm(dim=-1, keepdim=True)
         key_phrases_text_features /= key_phrases_text_features.norm(dim=-1, keepdim=True)
 
