@@ -265,6 +265,7 @@ class GalLoP(CLIP):
         class_names: Optional[List[str]] = None,
         text_features: Optional[Tensor] = None,
         local_text_features: Optional[Tensor] = None,
+        key_phrases_local_text_features: Optional[Tensor] = None
     ) -> Tensor:
         if class_names is not None:
             assert isinstance(class_names, list), "class_names must be a list of strings"
@@ -283,9 +284,6 @@ class GalLoP(CLIP):
             key_phrases_text_features, key_phrases_local_text_features = self.encode_text(data['key_phrase_1'])
             key_phrases_text_features /=  key_phrases_text_features.norm(dim=-1, keepdim=True)
             key_phrases_local_text_features /=  key_phrases_local_text_features.norm(dim=-1, keepdim=True)
-            
-            local_text_features = (local_text_features + key_phrases_local_text_features)/2
-            #text_features = (text_features + key_phrases_text_features)/2
 
         image_features, local_features = self.encode_image_and_proj(image)
 
@@ -295,6 +293,8 @@ class GalLoP(CLIP):
         if self.use_local_features:
             local_features = local_features / local_features.norm(dim=-1, keepdim=True)
             local_logits = torch.einsum("bpd,knd-> bpkn", local_features, local_text_features)
+            local_logits_key_phrases = torch.einsum("bpd,knd-> bpkn", local_features, key_phrases_local_text_features)
+            local_logits = torch.cat([local_logits, local_logits_key_phrases], dim=3) # stack both the prompts with and without discription 
         else:
             local_logits = None
 

@@ -131,8 +131,8 @@ def evaluate(
         key_phrases_local_text_features = key_phrases_local_text_features / key_phrases_local_text_features.norm(dim=-1, keepdim=True)
         key_phrases_text_features /= key_phrases_text_features.norm(dim=-1, keepdim=True)
 
-        local_text_features = (local_text_features+key_phrases_local_text_features)/2
-        text_features = (text_features + key_phrases_text_features)/2
+        #local_text_features = (local_text_features+key_phrases_local_text_features)/2
+        #text_features = (text_features + key_phrases_text_features)/2
 
 
     mode = model.training
@@ -144,7 +144,7 @@ def evaluate(
         targets = batch["target"].cuda(non_blocking=True)
 
         with autocast(enabled=args.use_fp16):
-            global_logits, local_logits = model(images, text_features=text_features, local_text_features=local_text_features)
+            global_logits, local_logits = model(images, text_features=text_features, local_text_features=local_text_features, key_phrases_local_text_features=key_phrases_local_text_features)
 
             if return_scores:
                 test_scores[batch["index"].numpy()] = model.compute_scores(global_logits, local_logits)
@@ -193,12 +193,12 @@ def evaluate_ood(
         
         data = pd.read_csv("/ood_datadrive/ood/models/GalLoP/gallop/vlprompt/key_phrases.csv")
             
-        key_phrases_text_features, key_phrases_local_text_features = model.encode_text(data['extracted key phrases'])
+        key_phrases_text_features, key_phrases_local_text_features = model.encode_text(data['key_phrase_1'])
         key_phrases_local_text_features = key_phrases_local_text_features / key_phrases_local_text_features.norm(dim=-1, keepdim=True)
         key_phrases_text_features /= key_phrases_text_features.norm(dim=-1, keepdim=True)
 
-        local_text_features = (local_text_features+key_phrases_local_text_features)/2
-        text_features = (text_features + key_phrases_text_features)/2
+        #local_text_features = (local_text_features+key_phrases_local_text_features)/2
+        #text_features = (text_features + key_phrases_text_features)/2
 
     mode = model.training
     model.eval()
@@ -207,7 +207,7 @@ def evaluate_ood(
         for batch in lib.track(val_loader, "Computing ood scores for Test"):
             images = batch["image"].cuda(non_blocking=True)
             with autocast(enabled=args.use_fp16):
-                global_logits, local_logits = model(images, text_features=text_features, local_text_features=local_text_features)
+                global_logits, local_logits = model(images, text_features=text_features, local_text_features=local_text_features, key_phrases_local_text_features=key_phrases_local_text_features)
                 test_scores[batch["index"].numpy()] = model.compute_scores(global_logits, local_logits)
 
     for ood_name, ood_loader in ood_loaders.items():
@@ -215,7 +215,7 @@ def evaluate_ood(
         for batch in lib.track(ood_loader, f"Computing ood scores for {ood_name}"):
             images = batch["image"].cuda(non_blocking=True)
             with autocast(args.use_fp16):
-                global_logits, local_logits = model(images, text_features=text_features, local_text_features=local_text_features)
+                global_logits, local_logits = model(images, text_features=text_features, local_text_features=local_text_features, key_phrases_local_text_features=key_phrases_local_text_features)
                 ood_scores[batch["index"].numpy()] = model.compute_scores(global_logits, local_logits)
 
         metrics[ood_name]["fpr95"] = lib.get_fpr(test_scores, ood_scores)
@@ -407,7 +407,7 @@ if __name__ == "__main__":
             val_meter, test_scores = evaluate(model, val_loader, args, return_scores=args.eval_ood and (args.eval_only or (epoch + 1 == args.max_epoch)))
             lib.LOGGER.info("Evaluation metrics: " + " ".join([" *"] + val_meter.summary()))
 
-            if args.eval_ood and (args.eval_only or (epoch % args.eval_freq == 0) or (epoch + 1 == args.max_epoch)):
+            if args.eval_ood and (args.eval_only or (epoch % args.eval_freq == 0) or (epoch + 1 == args.max_epoch + 1)):
                 val_meter, test_scores = evaluate(model, val_loader, args, return_scores=args.eval_ood)
                 ood_metrics = evaluate_ood(model, val_loader, ood_loaders, args, test_scores=test_scores)
                 lib.LOGGER.info(f"OOD Evaluation metrics with temperature scale {args.ood_temp_scale} (FPR95 / AUROC): ")
