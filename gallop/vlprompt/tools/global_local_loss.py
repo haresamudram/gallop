@@ -41,6 +41,9 @@ class GlobalLocalLoss(_WeightedLoss):
 
         if self.use_local_loss and local_logits is not None:
             local_logits = topk_reduce(local_logits, self.topk)
+            product_1 = local_logits[...,0] * local_logits[...,2]
+            product_2 = local_logits[...,1] * local_logits[...,3]
+            local_logits = torch.stack([product_1, product_2], dim=-1)
             local_loss = F.cross_entropy(logit_scale * local_logits, targets.unsqueeze(-1).expand(-1, local_logits.size(-1)))
 
 
