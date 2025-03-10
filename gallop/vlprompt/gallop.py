@@ -448,6 +448,9 @@ class GalLoP(CLIP):
             gl_probs = global_probs
         else:
             local_logits = vlp_tools.topk_reduce(local_logits, topk=self.topk)
+            product_1 = local_logits[...,0] * local_logits[...,2]
+            product_2 = local_logits[...,1] * local_logits[...,3]
+            local_logits = torch.stack([product_1, product_2], dim=-1)
             local_logits = local_logits.mean(dim=-1) # Local features of GalLoP
             local_probs = torch.softmax(logit_scale * local_logits, dim=-1)
             gl_logits = (global_logits + local_logits) / 2
