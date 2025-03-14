@@ -40,11 +40,9 @@ class GlobalLocalLoss(_WeightedLoss):
         global_loss = local_loss = 0.
 
         if self.use_local_loss and local_logits is not None:
-            local_logits = topk_reduce(local_logits, self.topk)
-            product_1 = local_logits[...,0] * local_logits[...,2]
-            product_2 = local_logits[...,1] * local_logits[...,3]
-            local_logits = torch.stack([product_1, product_2], dim=-1)
-            local_loss = F.cross_entropy(logit_scale * local_logits, targets.unsqueeze(-1).expand(-1, local_logits.size(-1)))
+            #local_logits = topk_reduce(local_logits, self.topk)
+            local_logits = local_logits[...,0] * local_logits[...,1] # Product of the logits : Focus on both MSR and LSR of the object in classification
+            local_loss = F.cross_entropy(logit_scale * local_logits, targets)
 
 
         if self.use_global_loss:

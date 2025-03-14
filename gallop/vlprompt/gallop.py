@@ -279,22 +279,45 @@ class GalLoP(CLIP):
             text_features = text_features / text_features.norm(dim=-1, keepdim=True)
             local_text_features = local_text_features / local_text_features.norm(dim=-1, keepdim=True) 
 
-            # text features with key phrases
-            data = pd.read_csv("/ood_datadrive/ood/models/GalLoP/gallop/vlprompt/key_phrases.csv")
-            key_phrases_text_features, key_phrases_local_text_features = self.encode_text(data['key_phrases_1_without_classname'])
-            key_phrases_text_features /=  key_phrases_text_features.norm(dim=-1, keepdim=True)
-            key_phrases_local_text_features /=  key_phrases_local_text_features.norm(dim=-1, keepdim=True)
 
         image_features, local_features = self.encode_image_and_proj(image)
 
         image_features = image_features / image_features.norm(dim=-1, keepdim=True)
-        global_logits = torch.einsum("bd,kmd-> bkm", image_features, text_features)
+        global_logits = torch.einsum("bd,kmd-> bkm", image_features, text_features)  # Global Logits from the global image feature
 
         if self.use_local_features:
             local_features = local_features / local_features.norm(dim=-1, keepdim=True)
-            local_logits = torch.einsum("bpd,knd-> bpkn", local_features, local_text_features)
-            local_logits_key_phrases = torch.einsum("bpd,knd-> bpkn", local_features, key_phrases_local_text_features)
-            local_logits = torch.cat([local_logits, local_logits_key_phrases], dim=3) # stack both the prompts with and without discription 
+            #local_logits = torch.einsum("bpd,knd-> bpkn", local_features, local_text_features)
+            
+            # Defining the Most Signficant and Lesser Significant image features 
+            _logits_ = local_features @ local_text_features.T.squeeze(1) # N x 196 x 1000
+            max_values, _ = torch.max(_logits_, dim=-1)
+            _, top_indices = torch.max(max_values, dim=-1) # top patch 
+            
+            # For each image, accumulate the MSR and LSR features
+            aggregated_local_features = torch.zeros((max_values.shape[0],2,512)).cuda()
+            for idx in range(top_indices.shape[0]):
+                similarity = torch.matmul(local_features[idx],local_features[idx][top_indices[idx]])
+                
+                # Most Significant Region
+                MSR = torch.zeros_like(similarity)
+                MSR[similarity > 0.85] = 1           # Threshold for MSR        
+
+                # Lesser Significant Region
+                LSR = torch.zeros_like(similarity)
+                LSR[similarity > 0.75] = 1          # Threshold for LSR
+                LSR[MSR == 1] = 0
+                if LSR.max() == 0:
+                    LSR = MSR  # If no LSR, then LSR = MSR
+
+                prompt_1 = local_features[idx][torch.where(MSR.flatten() == 1)[0],:].mean(dim=0)
+                prompt_2 = local_features[idx][torch.where(LSR.flatten() == 1)[0],:].mean(dim=0)
+                if (torch.isnan(prompt_1).any() or torch.isnan(prompt_2).any()):
+                    print('yes')
+                aggregated_local_features[idx] = torch.stack([prompt_1, prompt_2], dim=0)
+            
+            local_logits = torch.matmul(aggregated_local_features,local_text_features.T.squeeze(1)).permute(0, 2, 1)
+
         else:
             local_logits = None
 
@@ -447,11 +470,7 @@ class GalLoP(CLIP):
             local_probs = None
             gl_probs = global_probs
         else:
-            local_logits = vlp_tools.topk_reduce(local_logits, topk=self.topk)
-            product_1 = local_logits[...,0] * local_logits[...,2]
-            product_2 = local_logits[...,1] * local_logits[...,3]
-            local_logits = torch.stack([product_1, product_2], dim=-1)
-            local_logits = local_logits.mean(dim=-1) # Local features of GalLoP
+            local_logits = local_logits[...,0] * local_logits[...,1] # Product of the logits
             local_probs = torch.softmax(logit_scale * local_logits, dim=-1)
             gl_logits = (global_logits + local_logits) / 2
             gl_probs = torch.softmax(gl_logits, dim=-1)
