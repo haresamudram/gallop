@@ -287,36 +287,65 @@ class GalLoP(CLIP):
 
         if self.use_local_features:
             local_features = local_features / local_features.norm(dim=-1, keepdim=True)
-            #local_logits = torch.einsum("bpd,knd-> bpkn", local_features, local_text_features)
+            local_logits = torch.einsum("bpd,knd-> bpkn", local_features, local_text_features).squeeze(3)    
             
-            # Defining the Most Signficant and Lesser Significant image features 
-            _logits_ = local_features @ local_text_features.T.squeeze(1) # N x 196 x 1000
-            max_values, _ = torch.max(_logits_, dim=-1)
-            _, top_indices = torch.max(max_values, dim=-1) # top patch 
+            ############ Image feature aggreation #############################
+            # # Defining the Most Signficant and Lesser Significant image features 
+            # _logits_ = local_features @ local_text_features.T.squeeze(1) # N x 196 x 1000
+            # max_values, _ = torch.max(_logits_, dim=-1)
+            # _, top_indices = torch.max(max_values, dim=-1) # top patch 
             
-            # For each image, accumulate the MSR and LSR features
-            aggregated_local_features = torch.zeros((max_values.shape[0],2,512)).cuda()
-            for idx in range(top_indices.shape[0]):
-                similarity = torch.matmul(local_features[idx],local_features[idx][top_indices[idx]])
+            # # For each image, accumulate the MSR and LSR features
+            # aggregated_local_features = torch.zeros((max_values.shape[0],2,512)).cuda()
+            # for idx in range(top_indices.shape[0]):
+            #     similarity = torch.matmul(local_features[idx],local_features[idx][top_indices[idx]])
                 
-                # Most Significant Region
-                MSR = torch.zeros_like(similarity)
-                MSR[similarity > 0.85] = 1           # Threshold for MSR        
+            #     # Most Significant Region
+            #     MSR = torch.zeros_like(similarity)
+            #     MSR[similarity > 0.85] = 1           # Threshold for MSR        
 
-                # Lesser Significant Region
-                LSR = torch.zeros_like(similarity)
-                LSR[similarity > 0.75] = 1          # Threshold for LSR
-                LSR[MSR == 1] = 0
+            #     # Lesser Significant Region
+            #     LSR = torch.zeros_like(similarity)
+            #     LSR[similarity > 0.75] = 1          # Threshold for LSR
+            #     LSR[MSR == 1] = 0
+            #     if LSR.max() == 0:
+            #         LSR = MSR  # If no LSR, then LSR = MSR
+
+            #     prompt_1 = local_features[idx][torch.where(MSR.flatten() == 1)[0],:].mean(dim=0)
+            #     prompt_2 = local_features[idx][torch.where(LSR.flatten() == 1)[0],:].mean(dim=0)
+            #     if (torch.isnan(prompt_1).any() or torch.isnan(prompt_2).any()):
+            #         print('yes')
+            #     aggregated_local_features[idx] = torch.stack([prompt_1, prompt_2], dim=0)
+
+            ################# Logits aggregation #############################
+            # Locating the most confident patch
+            values = torch.max(local_logits, dim=-1)[0]
+            _,confident_patch_indices = torch.max(values, dim=-1)
+
+            aggregated_logits = []
+            
+            for idx in range(local_logits.shape[0]):
+                similarity = local_features[idx] @ local_features[idx][confident_patch_indices[idx]]
+                
+                # Compute MSR and LSR using efficient boolean indexing
+                MSR = (similarity > 0.85).float()
+                LSR = ((similarity > 0.75) & (MSR == 0)).float()
+
                 if LSR.max() == 0:
                     LSR = MSR  # If no LSR, then LSR = MSR
 
-                prompt_1 = local_features[idx][torch.where(MSR.flatten() == 1)[0],:].mean(dim=0)
-                prompt_2 = local_features[idx][torch.where(LSR.flatten() == 1)[0],:].mean(dim=0)
-                if (torch.isnan(prompt_1).any() or torch.isnan(prompt_2).any()):
-                    print('yes')
-                aggregated_local_features[idx] = torch.stack([prompt_1, prompt_2], dim=0)
+                # Efficient index extraction
+                MSR_indices = torch.where(MSR.flatten() == 1)[0]
+                LSR_indices = torch.where(LSR.flatten() == 1)[0]
+
+                prompt_1 = local_logits[idx, MSR_indices].mean(dim=0)
+                prompt_2 = local_logits[idx, LSR_indices].mean(dim=0)
+
+                aggregated_logits.append(torch.stack([prompt_1, prompt_2], dim=1))
             
-            local_logits = torch.matmul(aggregated_local_features,local_text_features.T.squeeze(1)).permute(0, 2, 1)
+            # Aggregation of the logits
+            local_logits = torch.stack(aggregated_logits, dim=0) # 128 x 1000 x 2 
+            #local_logits = torch.matmul(aggregated_local_features,local_text_features.T.squeeze(1)).permute(0, 2, 1)
 
         else:
             local_logits = None
@@ -415,7 +444,7 @@ class GalLoP(CLIP):
 
         if local_logits is not None:
             local_probs = torch.softmax(local_logits.mean(dim=-1) / self.ood_temp_scale, dim=-1).cpu().numpy()
-            local_score = -np.max(local_probs, axis=(1, 2))
+            local_score = -np.max(local_probs, axis=(1))
             scores += local_score
 
         return scores
