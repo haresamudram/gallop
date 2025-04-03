@@ -20,11 +20,37 @@ from gallop.datasets import return_train_val_datasets, return_ood_loaders, retur
 from gallop.vlprompt import GalLoP  # Original Model
 #from gallop.vlprompt import GalLoP_custom as GalLoP # Custom Model 
 from gallop.vlprompt.tools import GlobalLocalLoss
-
+from PIL import Image
 from torch.utils.tensorboard import SummaryWriter
 
 NoneType = Type[None]
 
+class CustomImageTransformation:
+    def __init__(self, transform=None):
+        """
+        Optionally, you can chain any standard transforms to be applied after your custom manipulation.
+        """
+        self.transform = transform
+
+    def __call__(self, sample):
+        """
+        Custom transformation to manipulate images.
+        - You can replace this with any image manipulation logic.
+        """
+        image, label = sample
+
+        # Example: Custom manipulation - you can update this logic
+        # For instance, let's say we want to invert the image as an example manipulation.
+        image = Image.fromarray(image.numpy(), 'RGB')  # Convert tensor to PIL image for manipulation
+        image = image.transpose(Image.FLIP_LEFT_RIGHT)  # Example of flipping the image horizontally
+        
+        # You can perform more complex transformations here if needed.
+
+        # Optionally apply further transforms like resizing, to tensor, etc.
+        if self.transform:
+            image = self.transform(image)
+
+        return image, label
 
 def train_one_epoch(
     model: GalLoP,
