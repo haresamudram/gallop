@@ -22,6 +22,96 @@ from gallop.vlprompt.tools import GlobalLocalLoss
 
 NoneType = Type[None]
 
+import cv2
+import clip
+class BackgroundMasking():
+    def __init__(self):
+        self.device = self.device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
+        self.args_gallop=read_yaml_to_cfg_gallop("Utlis/GalLoP_parameters_custom.yaml")
+        self.gallop = GalLoP(
+            clip_name=args.clip_name,
+            checkpointing_segments=10,
+            template="A photo of a {}",
+            class_names=imagenet_classes,
+            n_global_prompts=args.n_global_prompts,
+            n_local_prompts=args.n_local_prompts,
+            topk=args.topk,
+            parallel_text_encoder=True,
+            parallel_vision_encoder=True
+        )
+        self.preprocessor=clip._transform(224)
+        self.gallop.initialize_prompt()
+        lib.load_checkpoint(self.gallop, self.args_gallop.checkpoint_path)
+        self.gallop.freeze_clip()
+        self.gallop.cuda()
+        self.gallop.eval()
+
+        self.args_CLIP=read_yaml_to_cfg_gallop("Utlis/GalLoP_parameters_custom.yaml")
+        self.CLIP = GalLoP_custom(
+            clip_name=args.clip_name,
+            checkpointing_segments=10,
+            template="A photo of a {}",
+            class_names=imagenet_classes,
+            n_global_prompts=args.n_global_prompts,
+            n_local_prompts=args.n_local_prompts,
+            topk=args.topk,
+            parallel_text_encoder=True,
+            parallel_vision_encoder=True
+        )
+        self.preprocessor=clip._transform(224)
+        self.CLIP.initialize_prompt()
+        # load pre-trained prompts
+        lib.load_checkpoint(self.CLIP, args.checkpoint_path)
+        self.CLIP.freeze_clip()
+        self.CLIP.cuda()
+        self.CLIP.eval()
+
+        self.kernel = np.ones((3, 3), np.uint8) 
+    
+    def forward(self, images, k=5, threshold=0.65):
+        
+        # Inference for GalLoP, Iteration2 and CLIP
+        _, local_logits_gallop,_ = self.gallop(images)
+        local_logits_gallop = local_logits_gallop.mean(dim=-1)
+
+        # Cross-modal similarity for CLIP
+        _, image_local_features, proj = self.CLIP(images)
+        image_local_features_proj = image_local_features @ proj
+        image_local_features_proj /= image_local_features_proj.norm(dim=-1, keepdim=True)
+        max_values, patch_ids = torch.max(local_logits_gallop, dim=-1)
+        
+        # Finding the confident logit layers
+        logit_layers = local_logits_gallop[torch.arange(local_logits_gallop.shape[0]), :, patch_ids[torch.arange(local_logits_gallop.shape[0]), max_values.argmax(dim=-1)]]
+
+        mask_list = []
+        for b in range(images.shape[0]):
+            # Top-k patchs for robust similarity matrix
+            topk = torch.topk(logit_layers[b], k=k).indices
+            similarity_image_feature = torch.zeros((196)).to(self.device)
+            # Initialize similarity matrix
+            for j in range(k):
+                similarity_image_feature += image_local_features_proj[b] @ image_local_features_proj[b][topk[j]].T
+            similarity_image_feature /= k 
+            similarity_mask = similarity_image_feature > threshold  # Similarity mask
+
+            background = torch.zeros(196)
+            background[similarity_mask] = True
+            background = background.reshape((14,14))
+            background = background.squeeze().cpu().numpy().astype(np.uint8) * 255             
+
+            # Apply Morphological Opening & Closing
+            opened_np = cv2.dilate(background, self.kernel, iterations = 1)
+            closed_np = cv2.erode(opened_np, self.kernel, iterations = 1)
+
+            mask_expanded = np.kron(closed_np, np.ones((16, 16), dtype=np.uint8))
+            mask_tensor = torch.tensor(mask_expanded, dtype=torch.float32).unsqueeze(0).bool()
+            mask_list.append(mask_tensor)
+
+        mask_tensor = torch.stack(mask_list) # Stack to a tensor
+        
+        # Background masked images
+        masked_image = images * mask_tensor.to(self.device)
+        return masked_image
 
 def train_one_epoch(
     model: GalLoP,

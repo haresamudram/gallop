@@ -1,13 +1,14 @@
 CUDA_VISIBLE_DEVICES=0 python train.py \
     --clip_name clip_vit_b16 \
     --exp_name imagenet_shot_16 \
-    --save_dir /ood_datadrive/ood/results/GaLloP/NearOOD/key_phrases_9 \
+    --save_dir /ood_datadrive/ood/results/GaLloP/NearOOD/background_masking \
+    --checkpoint_path /ood_datadrive/ood/results/GaLloP/NearOOD/background_masking/imagenet_shot_16/gallop_imagenet_vit_b16_seed1.ckpt \
     --dataset_name imagenet \
     --max_epoch 50 \
     --batch_size 128 \
     --inference_batch_size 128 \
     --eval_ood True \
-    --eval_only False \
+    --eval_only True \
     --eval_domains False \
     --eval_freq 10 \
     --checkpointing_segments 7 \
@@ -23,6 +24,6 @@ CUDA_VISIBLE_DEVICES=0 python train.py \
     --use_local_loss True \
     --learn_local_proj True \
     --learn_local_prompt True \
-    --n_local_prompts 1 \
-    --topk 5\
-    --iteration 9 \
+    --n_local_prompts 2 \
+    --topk 5 15\
+    --iteration 1 \

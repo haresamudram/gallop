@@ -16,8 +16,6 @@ import gallop.vlprompt.tools as vlp_tools
 from gallop.vlprompt.prompted_transformers import PromptedTransformer
 from gallop.vlprompt.clip_local import ModifiedResNet, VisionTransformer, CLIP
 
-import pandas as pd
-
 NoneType = Type[None]
 KwargType = Dict[str, Any]
 CLIP_NAME = {"clip_vit_b32": "ViT-B/32", "clip_vit_b16": "ViT-B/16", "clip_resnet50": "RN50", "clip_resnet101": "RN101"}
@@ -37,7 +35,7 @@ class Linear(nn.Module):
         return self.linear(x)
 
 
-class GalLoP(CLIP):
+class GalLoP_default(CLIP):
     TRAINABLE_PARAMS: List[str] = []
 
     def __init__(
@@ -80,10 +78,13 @@ class GalLoP(CLIP):
         self.ood_method = ood_method
         self.ood_temp_scale = ood_temp_scale
         self.topk = topk
-        
 
         self.parallel_text_encoder = parallel_text_encoder
         self.parallel_vision_encoder = parallel_vision_encoder
+
+        
+        self.text_features = None
+        self.local_text_features = None
 
         if isinstance(clip_kwargs["vision_layers"], (tuple, list)):
             self.visual = ModifiedResNet(
@@ -258,14 +259,30 @@ class GalLoP(CLIP):
                 local_features = local_features @ self.visual.proj
 
         return image_features, local_features
-
+    
+    def custom_image_encoder(self, image: Tensor) -> Tuple[Tensor, Tensor]:
+        _, local_features = self.encode_image(image)
+        image_local_features_proj = local_features @ self.visual.proj
+        image_local_features_proj /= image_local_features_proj.norm(dim=-1, keepdim=True)
+        return local_features, image_local_features_proj
+    
     def forward(
         self,
         image: Tensor,
         class_names: Optional[List[str]] = None,
         text_features: Optional[Tensor] = None,
-        local_text_features: Optional[Tensor] = None
+        local_text_features: Optional[Tensor] = None,
     ) -> Tensor:
+        
+        if self.local_text_features is None:
+            self.text_features, self.local_text_features = self.encode_text(self.class_names)
+            self.text_features /= self.text_features.norm(dim=-1, keepdim=True)
+            self.local_text_features /=  self.local_text_features.norm(dim=-1, keepdim=True)
+            
+        text_features = self.text_features
+        local_text_features = self.local_text_features  
+        
+        
         if class_names is not None:
             assert isinstance(class_names, list), "class_names must be a list of strings"
         if text_features is not None:
@@ -276,20 +293,22 @@ class GalLoP(CLIP):
             assert local_text_features is None, "local_text_features should be None if text_features is None"
             text_features, local_text_features = self.encode_text(class_names)
             text_features = text_features / text_features.norm(dim=-1, keepdim=True)
-            local_text_features = local_text_features / local_text_features.norm(dim=-1, keepdim=True) 
-
+            local_text_features /= self.local_text_features.norm(dim=-1, keepdim=True)
 
         image_features, local_features = self.encode_image_and_proj(image)
 
         image_features = image_features / image_features.norm(dim=-1, keepdim=True)
-        global_logits = torch.einsum("bd,kmd-> bkm", image_features, text_features)  # Global Logits from the global image feature
+        global_logits = torch.einsum("bd,kmd-> bkm", image_features, text_features)
 
         if self.use_local_features:
             local_features = local_features / local_features.norm(dim=-1, keepdim=True)
-            local_logits = torch.einsum("bpd,knd-> bpkn", local_features, local_text_features).squeeze(3)    
+            local_logits = torch.einsum("bpd,knd-> bpkn", local_features, local_text_features)
         else:
             local_logits = None
 
+        global_logits = global_logits.mean(dim=-1)
+        #local_logits = local_logits.mean(dim=-1)
+        
         return global_logits, local_logits
 
     def _prompt_features(self, promtps: Tensor) -> Tensor:
@@ -373,76 +392,5 @@ class GalLoP(CLIP):
         if self.learn_local_prompts:
             self.local_prompts.data[:, : self.template_init_tokens].copy_(global_prompt_init.clone().expand(self.n_local_prompts, -1, -1))
 
-    def compute_gl_scores(
-        self,
-        global_logits: Tensor,
-        local_logits: Optional[Tensor],
-    ) -> NoneType:
-        global_logits = global_logits.mean(dim=-1)
-        global_probs = torch.softmax(global_logits / self.ood_temp_scale, dim=-1).cpu().numpy()
-        scores = -np.max(global_probs, axis=-1)
 
-        if local_logits is not None:
-            local_probs = torch.softmax(local_logits.mean(dim=-1) / self.ood_temp_scale, dim=-1).cpu().numpy()
-            local_score = -np.max(local_probs, axis=(1,2))
-            scores += local_score
 
-        return scores
-
-    def compute_L_mcm_scores(
-        self,
-        local_logits: Tensor,
-    ) -> NoneType:
-        assert local_logits is not None
-        local_probs = torch.softmax(local_logits.mean(dim=-1) / self.ood_temp_scale, dim=-1).cpu().numpy()
-        local_score = -np.max(local_probs, axis=(1, 2))
-        return local_score
-
-    def compute_mcm_scores(
-        self,
-        global_logits: Tensor,
-    ) -> NoneType:
-        global_logits = global_logits.mean(dim=-1)
-        global_probs = torch.softmax(global_logits / self.ood_temp_scale, dim=-1).cpu().numpy()
-        global_score = -np.max(global_probs, axis=-1)
-        return global_score
-
-    def compute_scores(
-        self,
-        global_logits: Tensor,
-        local_logits: Optional[Tensor],
-        ood_method: Optional[str] = None,
-    ) -> NoneType:
-        if ood_method is None:
-            ood_method = self.ood_method
-
-        if ood_method == "GL-MCM":
-            return self.compute_gl_scores(global_logits, local_logits)
-        elif ood_method == "MCM":
-            return self.compute_mcm_scores(global_logits)
-        elif ood_method == "L-MCM":
-            return self.compute_L_mcm_scores(local_logits)
-        else:
-            raise ValueError(f"Method {self.ood_method} not implemented")
-
-    @torch.no_grad()
-    def create_prediction_scores(
-        self,
-        global_logits: Tensor,
-        local_logits: Optional[Tensor],
-    ) -> Tensor:
-        logit_scale = self.logit_scale.exp()
-        global_logits = global_logits.mean(dim=-1)
-        global_probs = torch.softmax(logit_scale * global_logits, dim=-1)
-
-        if local_logits is None:
-            local_probs = None
-            gl_probs = global_probs
-        else:
-            local_logits = vlp_tools.topk_reduce(local_logits, topk=self.topk)
-            local_logits = local_logits.mean(dim=-1)
-            local_probs = torch.softmax(logit_scale * local_logits, dim=-1)
-            gl_logits = (global_logits + local_logits) / 2
-            gl_probs = torch.softmax(logit_scale * gl_logits, dim=-1)
-
-        return gl_probs, global_probs, local_probs

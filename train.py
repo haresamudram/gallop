@@ -18,39 +18,18 @@ import gallop.vlprompt.tools as vlp_tools
 import gallop.datasets.tools as dts_tools
 from gallop.datasets import return_train_val_datasets, return_ood_loaders, return_domains_loaders
 from gallop.vlprompt import GalLoP  # Original Model
-#from gallop.vlprompt import GalLoP_custom as GalLoP # Custom Model 
+from gallop.vlprompt import GalLoP_default # Default Model
+from gallop.vlprompt import GalLoP_custom # Modified to CLIP image encoder 
 from gallop.vlprompt.tools import GlobalLocalLoss
 from PIL import Image
 from torch.utils.tensorboard import SummaryWriter
 
 NoneType = Type[None]
 
-class CustomImageTransformation:
-    def __init__(self, transform=None):
-        """
-        Optionally, you can chain any standard transforms to be applied after your custom manipulation.
-        """
-        self.transform = transform
-
-    def __call__(self, sample):
-        """
-        Custom transformation to manipulate images.
-        - You can replace this with any image manipulation logic.
-        """
-        image, label = sample
-
-        # Example: Custom manipulation - you can update this logic
-        # For instance, let's say we want to invert the image as an example manipulation.
-        image = Image.fromarray(image.numpy(), 'RGB')  # Convert tensor to PIL image for manipulation
-        image = image.transpose(Image.FLIP_LEFT_RIGHT)  # Example of flipping the image horizontally
-        
-        # You can perform more complex transformations here if needed.
-
-        # Optionally apply further transforms like resizing, to tensor, etc.
-        if self.transform:
-            image = self.transform(image)
-
-        return image, label
+import cv2
+import clip
+from gallop_functions import * 
+from imagenet_templates import *
 
 def train_one_epoch(
     model: GalLoP,
@@ -150,16 +129,6 @@ def evaluate(
         text_features, local_text_features = model.encode_text(class_names)
         text_features /= text_features.norm(dim=-1, keepdim=True)
         local_text_features /= local_text_features.norm(dim=-1, keepdim=True)
-        
-        data = pd.read_csv("/ood_datadrive/ood/models/GalLoP/gallop/vlprompt/key_phrases.csv")
-            
-        key_phrases_text_features, key_phrases_local_text_features = model.encode_text(data['key_phrases_1_without_classname'])
-        key_phrases_local_text_features = key_phrases_local_text_features / key_phrases_local_text_features.norm(dim=-1, keepdim=True)
-        key_phrases_text_features /= key_phrases_text_features.norm(dim=-1, keepdim=True)
-
-        #local_text_features = (local_text_features+key_phrases_local_text_features)/2
-        #text_features = (text_features + key_phrases_text_features)/2
-
 
     mode = model.training
     model.eval()
@@ -170,7 +139,7 @@ def evaluate(
         targets = batch["target"].cuda(non_blocking=True)
 
         with autocast(enabled=args.use_fp16):
-            global_logits, local_logits = model(images, text_features=text_features, local_text_features=local_text_features, key_phrases_local_text_features=key_phrases_local_text_features)
+            global_logits, local_logits = model(images, text_features=text_features, local_text_features=local_text_features)
 
             if return_scores:
                 test_scores[batch["index"].numpy()] = model.compute_scores(global_logits, local_logits)
@@ -216,15 +185,6 @@ def evaluate_ood(
         text_features, local_text_features = model.encode_text(class_names)
         text_features /= text_features.norm(dim=-1, keepdim=True)
         local_text_features /= local_text_features.norm(dim=-1, keepdim=True)
-        
-        data = pd.read_csv("/ood_datadrive/ood/models/GalLoP/gallop/vlprompt/key_phrases.csv")
-            
-        key_phrases_text_features, key_phrases_local_text_features = model.encode_text(data['key_phrases_1_without_classname'])
-        key_phrases_local_text_features = key_phrases_local_text_features / key_phrases_local_text_features.norm(dim=-1, keepdim=True)
-        key_phrases_text_features /= key_phrases_text_features.norm(dim=-1, keepdim=True)
-
-        #local_text_features = (local_text_features+key_phrases_local_text_features)/2
-        #text_features = (text_features + key_phrases_text_features)/2
 
     mode = model.training
     model.eval()
@@ -233,7 +193,7 @@ def evaluate_ood(
         for batch in lib.track(val_loader, "Computing ood scores for Test"):
             images = batch["image"].cuda(non_blocking=True)
             with autocast(enabled=args.use_fp16):
-                global_logits, local_logits = model(images, text_features=text_features, local_text_features=local_text_features, key_phrases_local_text_features=key_phrases_local_text_features)
+                global_logits, local_logits = model(images, text_features=text_features, local_text_features=local_text_features)
                 test_scores[batch["index"].numpy()] = model.compute_scores(global_logits, local_logits)
 
     for ood_name, ood_loader in ood_loaders.items():
@@ -241,7 +201,7 @@ def evaluate_ood(
         for batch in lib.track(ood_loader, f"Computing ood scores for {ood_name}"):
             images = batch["image"].cuda(non_blocking=True)
             with autocast(args.use_fp16):
-                global_logits, local_logits = model(images, text_features=text_features, local_text_features=local_text_features, key_phrases_local_text_features=key_phrases_local_text_features)
+                global_logits, local_logits = model(images, text_features=text_features, local_text_features=local_text_features)
                 ood_scores[batch["index"].numpy()] = model.compute_scores(global_logits, local_logits)
 
         metrics[ood_name]["fpr95"] = lib.get_fpr(test_scores, ood_scores)
@@ -360,7 +320,7 @@ if __name__ == "__main__":
         domains_loaders = return_domains_loaders(args.data_dir, val_transform)
 
     # Setting-up tensorboard
-    folder_path = os.path.join("/ood_datadrive/ood/results/GaLloP/NearOOD", "logs", f"key_featrures_iteration_{args.iteration}")
+    folder_path = os.path.join("/ood_datadrive/ood/results/GaLloP/NearOOD", "logs", f"background_masking_iteration_{args.iteration}")
     os.makedirs(os.path.join("/ood_datadrive/ood/results/GaLloP/NearOOD", "logs"), exist_ok=True)
     writer = SummaryWriter(log_dir=folder_path)
 
@@ -410,7 +370,7 @@ if __name__ == "__main__":
 
     # Setting-up GradScaler for amp
     fp16_scaler = GradScaler(enabled=args.use_fp16)
-
+    
     # Training loop
     for epoch in range(args.max_epoch):
         if not args.eval_only:
@@ -423,7 +383,7 @@ if __name__ == "__main__":
                 lr_scheduler=lr_scheduler,
                 epoch=epoch,
                 fp16_scaler=fp16_scaler,
-                args=args,
+                args=args
             )
 
             lib.save_checkpoint(args.save_dir, epoch, model, optimizer, lr_scheduler, fp16_scaler, train_meter, args)

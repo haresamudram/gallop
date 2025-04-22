@@ -16,6 +16,7 @@ import gallop.vlprompt.tools as vlp_tools
 from gallop.vlprompt.prompted_transformers import PromptedTransformer
 from gallop.vlprompt.clip_local import ModifiedResNet, VisionTransformer, CLIP
 
+
 NoneType = Type[None]
 KwargType = Dict[str, Any]
 CLIP_NAME = {"clip_vit_b32": "ViT-B/32", "clip_vit_b16": "ViT-B/16", "clip_resnet50": "RN50", "clip_resnet101": "RN101"}
@@ -84,6 +85,9 @@ class GalLoP_custom(CLIP):
 
         self.parallel_text_encoder = parallel_text_encoder
         self.parallel_vision_encoder = parallel_vision_encoder
+
+        self.text_features = None
+        self.local_text_features = None
 
         if isinstance(clip_kwargs["vision_layers"], (tuple, list)):
             self.visual = ModifiedResNet(
@@ -252,12 +256,12 @@ class GalLoP_custom(CLIP):
 
         local_features = self.local_proj(local_features)
 
-        if hasattr(self.visual, "proj"):
-            image_features = image_features @ self.visual.proj
-            if self.use_local_features:
-                local_features = local_features @ self.visual.proj
+        # if hasattr(self.visual, "proj"):
+        #     image_features = image_features @ self.visual.proj
+        #     if self.use_local_features:
+        #         local_features = local_features @ self.visual.proj
 
-        return image_features, local_features
+        return image_features, local_features, self.visual.proj
 
     def forward(
         self,
@@ -266,6 +270,13 @@ class GalLoP_custom(CLIP):
         text_features: Optional[Tensor] = None,
         local_text_features: Optional[Tensor] = None,
     ) -> Tensor:
+        
+        if self.text_features is None:
+            self.text_features, self.local_text_features = self.encode_text(self.class_names)
+        text_features, local_text_features = self.text_features, self.local_text_features
+        text_features /= self.text_features.norm(dim=-1, keepdim=True)
+        local_text_features /= self.local_text_features.norm(dim=-1, keepdim=True)        
+        
         if class_names is not None:
             assert isinstance(class_names, list), "class_names must be a list of strings"
         if text_features is not None:
@@ -278,35 +289,9 @@ class GalLoP_custom(CLIP):
             text_features = text_features / text_features.norm(dim=-1, keepdim=True)
             local_text_features = local_text_features / local_text_features.norm(dim=-1, keepdim=True) if self.learn_local_prompts else text_features
 
-        image_features, local_features = self.encode_image_and_proj(image)
+        image_features, local_features, proj = self.encode_image_and_proj(image)
 
-        image_features = image_features / image_features.norm(dim=-1, keepdim=True)
-        global_logits = torch.einsum("bd,kmd-> bkm", image_features, text_features)
-
-        if self.use_local_features:
-            local_features = local_features / local_features.norm(dim=-1, keepdim=True)
-            # Filtering local features based on global promts
-            
-            k = self.patch_filtering
-            b, num_features, feature_dim = local_features.shape  # b: batch size, num_features: 196, feature_dim: 512
-            assert k <= num_features, "k cannot be greater than the number of features (196)"
-
-            prompts = text_features.permute(1, 0, 2)  # Shape: [4, 512, 1000]
-            sample_image_logits = torch.matmul(local_features.unsqueeze(1), prompts.transpose(-2, -1))  # Shape: [b, 4, 196, 1000]
-
-            avg_tensor = torch.max(sample_image_logits, dim=-1)[0].mean(dim=1)  # Compute averaged max values [b, 196]
-            _, indices = torch.topk(avg_tensor, k=k, dim=-1, largest=False)  # Get least k indices [b, k]
-
-            mask = torch.ones((b, num_features), dtype=bool, device=local_features.device).scatter_(1, indices, False)
-            filtered_local_features = local_features[mask].view(b, num_features - k, feature_dim)  # Shape: [b, 46, 512]
-            local_features = filtered_local_features
-
-            local_logits = torch.einsum("bpd,knd-> bpkn", local_features, local_text_features)
-            
-        else:
-            local_logits = None
-
-        return global_logits, local_logits
+        return image_features, local_features, proj
 
     def _prompt_features(self, promtps: Tensor) -> Tensor:
         tokenized_text = clip.tokenize("").cuda(non_blocking=True)
