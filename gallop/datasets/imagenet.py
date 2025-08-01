@@ -15,8 +15,11 @@ IMG_EXTENSIONS = (".jpg", ".jpeg", ".png", ".ppm", ".bmp", ".pgm", ".tif", ".tif
 
 
 def is_valid_file(x: str) -> bool:
-    return has_file_allowed_extension(x, IMG_EXTENSIONS)  # type: ignore[arg-type]
-
+    # filtering images from segmentation mask
+    if 'segmentation_masks' in x:
+        return "_original_" in x and has_file_allowed_extension(x, IMG_EXTENSIONS) # type: ignore[arg-type]
+    else: 
+        return has_file_allowed_extension(x, IMG_EXTENSIONS)
 
 class ImagenetDataset(ImageFolder):
     def __init__(self, root: str, *args: ArgsType, **kwargs: KwargsType) -> NoneType:
