@@ -17,8 +17,7 @@ import gallop.lib as lib
 import gallop.vlprompt.tools as vlp_tools
 import gallop.datasets.tools as dts_tools
 from gallop.datasets import return_train_val_datasets, return_ood_loaders, return_domains_loaders
-#from gallop.vlprompt import GalLoP  # Original Model
-from gallop.vlprompt import GalLoP_custom as GalLoP # Custom Model 
+from gallop.vlprompt import GalLoP
 from gallop.vlprompt.tools import GlobalLocalLoss
 
 from torch.utils.tensorboard import SummaryWriter
@@ -208,7 +207,7 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser("Learning prompts for CLIP with local and global features")
     parser.add_argument("--exp_name", default=None, type=str)
-    parser.add_argument("--data_dir", default="/ood_datadrive/ood/dataset/data", type=str)
+    parser.add_argument("--data_dir", default="/home/ffz5cni/ood/dataset/data", type=str)
     parser.add_argument("--save_dir", default="./results/", type=str)
     parser.add_argument("--checkpoint_path", default=None, type=str)
     parser.add_argument("--dataset_name", default="imagenet", type=str)
@@ -264,9 +263,9 @@ if __name__ == "__main__":
     folder = "/ood_datadrive/ood/results/GaLloP/NearOOD/training_params"
     file = f"iteration_{args.iteration}.yaml"
     file_path = os.path.join(folder, file)
-    os.makedirs(folder, exist_ok=True)
-    with open(file_path, "w") as file:
-        yaml.dump(args, file, default_flow_style=False)
+    #os.makedirs(folder, exist_ok=True)
+    #with open(file_path, "w") as file:
+    #    yaml.dump(args, file, default_flow_style=False)
 
     lib.setup_logger()
     lib.random_seed(args.seed)
@@ -306,7 +305,7 @@ if __name__ == "__main__":
         domains_loaders = return_domains_loaders(args.data_dir, val_transform)
 
     # Setting-up tensorboard
-    folder_path = os.path.join("/ood_datadrive/ood/results/GaLloP/NearOOD", "logs")
+    folder_path = os.path.join("/home/ffz5cni/ood/results/GaLloP/NearOOD", "logs")
     writer = SummaryWriter(log_dir=folder_path)
 
     # Setting-up model

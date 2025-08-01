@@ -197,7 +197,7 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser("Learning prompts for CLIP with local and global features")
     parser.add_argument("--exp_name", default=None, type=str)
-    parser.add_argument("--data_dir", default="/share/DEEPLEARNING/datasets", type=str)
+    parser.add_argument("--data_dir", default="/home/ffz5cni/ood/dataset/data", type=str)
     parser.add_argument("--save_dir", default="./results/", type=str)
     parser.add_argument("--checkpoint_path", default=None, type=str)
     parser.add_argument("--dataset_name", default="imagenet", type=str)

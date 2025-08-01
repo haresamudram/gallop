@@ -91,7 +91,7 @@ def return_train_val_datasets(
 ) -> Tuple[Dataset, Dataset, str]:
     if name == "imagenet":
         train_dataset = ImagenetDataset(
-            root=os.path.join(data_dir, 'imagenet', 'images', "train"),
+            root=os.path.join('/home/ffz5cni/ood/clip_tuning', 'segmentation_masks'),
             transform=train_transform,
         )
         val_dataset = ImagenetDataset(
@@ -233,43 +233,43 @@ def return_ood_loaders(
     return {
         "Ninco": tools.get_eval_loader(
             ImageFolder(
-                root=os.path.join("/ood_datadrive/ood/dataset/images_largescale", "ninco"),
+                root=os.path.join("/home/ffz5cni/ood/dataset/images_largescale", "ninco"),
                 transform=transform,
             )
         ),
         "SSB-Hard": tools.get_eval_loader(
             ImageFolder(
-                root=os.path.join("/ood_datadrive/ood/dataset/images_largescale", "ssb_hard"),
+                root=os.path.join("/home/ffz5cni/ood/dataset/images_largescale", "ssb_hard"),
                 transform=transform,
             )
         ),
         "iNaturalist": tools.get_eval_loader(
             ImageFolder(
-                root=os.path.join("/ood_datadrive/ood/dataset/images_largescale", "inaturalist"),
+                root=os.path.join("/home/ffz5cni/ood/dataset/images_largescale", "inaturalist"),
                 transform=transform,
             )
         ),
         "SUN": tools.get_eval_loader(
             ImageFolder(
-                root=os.path.join("/ood_datadrive/ood/dataset/images_largescale", "sun"),
+                root=os.path.join("/home/ffz5cni/ood/dataset/images_largescale", "sun"),
                 transform=transform,
             )
         ),
         "Places": tools.get_eval_loader(
             ImageFolder(
-                root=os.path.join("/ood_datadrive/ood/dataset/images_largescale", "places365"),
+                root=os.path.join("/home/ffz5cni/ood/dataset/images_largescale", "places365"),
                 transform=transform,
             )
         ),
         "Textures": tools.get_eval_loader(
             ImageFolder(
-                root=os.path.join("/ood_datadrive/ood/dataset/images_classic", "texture"),
+                root=os.path.join("/home/ffz5cni/ood/dataset/images_classic", "texture"),
                 transform=transform,
             )
         ),
         "OpenImage": tools.get_eval_loader(
             ImageFolder(
-                root=os.path.join("/ood_datadrive/ood/dataset/images_largescale", "openimage_o"),
+                root=os.path.join("/home/ffz5cni/ood/dataset/images_largescale", "openimage_o"),
                 transform=transform,
             )
         ),
