@@ -72,6 +72,6 @@ def create_few_shots_dataset(dts: Dataset, num_shots: int, seed: int) -> Subset:
 
     num_classes = len(set(labels))
     splits = StratifiedShuffleSplit(n_splits=1, train_size=num_shots * num_classes, random_state=seed)
-    indices, _ = next(splits.split(labels, labels))
-    new_dts = Subset(dts, indices)
-    return new_dts
+    #indices, _ = next(splits.split(labels, labels))
+    #new_dts = Subset(dts, indices)
+    return dts
